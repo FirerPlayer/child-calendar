@@ -7,11 +7,10 @@ declare global {
 		// interface PageData {}
 		// interface Platform {}
 	}
-	namespace svelteHTML {
-		import type { AttributifyAttributes } from '@unocss/preset-attributify';
+	// namespace svelteHTML {
+	// 	import type { AttributifyAttributes } from '@unocss/preset-attributify';
 
-		type HTMLAttributes = AttributifyAttributes;
-	}
+	// 	type HTMLAttributes = AttributifyAttributes;
+	// }
 }
-
 export {};

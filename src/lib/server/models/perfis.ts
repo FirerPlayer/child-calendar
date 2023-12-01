@@ -1,14 +1,20 @@
-import { pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
-import { users } from './auth';
+import { pgEnum, pgTable, text, timestamp, uuid, type PgEnum } from 'drizzle-orm/pg-core';
+
+export type PerfisSelect = typeof perfis.$inferSelect;
+export type PerfisInsert = typeof perfis.$inferInsert;
+export type PerfisUpdate = {
+	nome?: string;
+	nomeUsuario?: string;
+	dataNascimento?: Date;
+	funcao?: (typeof funcoes.enumValues)[number];
+	cargo?: string;
+};
 
 export const funcoes = pgEnum('funcoes', ['supervisor', 'cuidador', 'admin']);
 export const perfis = pgTable('perfis', {
-	userId: uuid('user_id')
-		.notNull()
-		.primaryKey()
-		.references(() => users.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+	userId: text('user_id').notNull().primaryKey(),
 	nome: text('nome').notNull(),
-	nomeUsuario: text('nome_usuario').notNull().unique(),
+	nomeUsuario: text('nome_usuario').notNull(),
 	dataNascimento: timestamp('data_nascimento'),
 	funcao: funcoes('funcao').notNull().default('supervisor'),
 	cargo: text('cargo'),

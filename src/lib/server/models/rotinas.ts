@@ -10,10 +10,21 @@ import {
 } from 'drizzle-orm/pg-core';
 import { imagens } from './imagens';
 import { sons } from './sons';
-import { users } from './auth';
+import { perfis } from './perfis';
 
 export type RotinaInsert = typeof rotinas.$inferInsert;
 export type RotinaSelect = typeof rotinas.$inferSelect;
+export type RotinaUpdate = {
+	nome?: string;
+	descricao?: string;
+	dataInicio?: Date;
+	dataFim?: Date;
+	estado?: (typeof rotinaEstado.enumValues)[number];
+	complexidade?: (typeof complexidade.enumValues)[number];
+	somEstimuloId?: string;
+	imagemId: string;
+	tarefas?: Tarefas[];
+};
 
 export type Tarefas = {
 	titulo: string;
@@ -21,7 +32,7 @@ export type Tarefas = {
 	completo: boolean;
 };
 
-export const rotina_estado = pgEnum('rotina_estado', [
+export const rotinaEstado = pgEnum('rotina_estado', [
 	'desativado',
 	'pendente',
 	'concluido',
@@ -32,16 +43,16 @@ export const complexidade = pgEnum('complexidade', ['baixa', 'media', 'alta', 'm
 
 export const rotinas = pgTable('rotinas', {
 	id: uuid('id').notNull().primaryKey().defaultRandom(),
-	userId: uuid('user_id')
+	userId: text('user_id')
 		.notNull()
-		.references(() => users.id, { onDelete: 'cascade', onUpdate: 'cascade' }),
+		.references(() => perfis.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
 	nome: text('nome'),
 	descricao: text('descricao'),
-	dataInicio: timestamp('data_inicio').notNull(),
+	dataInicio: timestamp('data_inicio'),
 	dataFim: timestamp('data_fim'),
 	imagemId: uuid('imagem_id').references(() => imagens.id),
 	somEstimuloId: uuid('som_estimulo_id').references(() => sons.id),
-	estado: rotina_estado('estado').notNull().default('pendente'),
+	estado: rotinaEstado('estado').notNull().default('pendente'),
 	complexidade: complexidade('complexidade').notNull().default('media'),
 	tarefas: jsonb('tarefas').$type<Tarefas[]>(),
 	criadoEm: timestamp('criado_em').notNull().defaultNow(),

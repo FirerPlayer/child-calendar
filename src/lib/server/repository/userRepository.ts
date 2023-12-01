@@ -1,37 +1,63 @@
-import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
-import { users, type UserInsert, type UserSelect } from '../models/auth';
-import { eq } from 'drizzle-orm';
-import db from '../db';
-import { hashPassword } from '../utils/validateUser';
+// import type { PostgresJsDatabase } from 'drizzle-orm/postgres-js';
+// import { users, type UserInsert, type UserSelect } from '../models/auth';
+// import { eq } from 'drizzle-orm';
+// import db from '../db';
+// import { hashPassword } from '../utils/validateUser';
+// import type { Output } from './types';
 
-function createUserRepository(db: PostgresJsDatabase) {
-	return {
-		async createUser(user: UserInsert): Promise<string> {
-			const res = await db
-				.insert(users)
-				.values({
-					...user,
-					password: user.password ? await hashPassword(user.password) : undefined
-				})
-				.returning({ id: users.id });
-			return res[0].id;
-		},
-		async findUserById(id: string): Promise<UserSelect | null> {
-			const res = await db.select().from(users).where(eq(users.id, id));
-			if (!res.length) {
-				return null;
-			}
-			return res[0];
-		},
-		async findUserByEmail(email: string): Promise<UserSelect | null> {
-			const res = await db.select().from(users).where(eq(users.email, email));
-			if (!res.length) {
-				return null;
-			}
-			return res[0];
-		}
-	};
-}
+// type OutputUserRepository = Output<UserSelect>;
+// function createUserRepository(db: PostgresJsDatabase) {
+// 	return {
+// 		async createUser(user: UserInsert): Promise<OutputUserRepository> {
+// 			let out: OutputUserRepository = {};
+// 			try {
+// 				let o = await db.insert(users).values(user).returning();
+// 				if (!o.length) {
+// 					out.error = new Error('Erro ao criar usuário');
+// 				} else {
+// 					out.res = o[0];
+// 				}
+// 			} catch (error) {
+// 				out.error = new Error('Erro ao criar usuário', {
+// 					cause: error
+// 				});
+// 			}
+// 			return out;
+// 		},
+// 		async findUserById(id: string): Promise<OutputUserRepository> {
+// 			let out: OutputUserRepository = {};
+// 			try {
+// 				let o = await db.select().from(users).where(eq(users.id, id));
+// 				if (!o.length) {
+// 					out.error = new Error('Usuário não encontrado');
+// 				} else {
+// 					out.res = o[0];
+// 				}
+// 			} catch (error) {
+// 				out.error = new Error('Erro ao buscar usuário pelo id', {
+// 					cause: error
+// 				});
+// 			}
+// 			return out;
+// 		},
+// 		async findUserByEmail(email: string): Promise<OutputUserRepository> {
+// 			let out: OutputUserRepository = {};
+// 			try {
+// 				let o = await db.select().from(users).where(eq(users.email, email));
+// 				if (!o.length) {
+// 					out.error = new Error('Usuário não encontrado');
+// 				} else {
+// 					out.res = o[0];
+// 				}
+// 			} catch (error) {
+// 				out.error = new Error('Erro ao buscar usuário pelo email', {
+// 					cause: error
+// 				});
+// 			}
+// 			return out;
+// 		}
+// 	};
+// }
 
-const userRepository = createUserRepository(db);
-export default userRepository;
+// const userRepository = createUserRepository(db);
+// export default userRepository;

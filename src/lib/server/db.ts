@@ -14,5 +14,5 @@ const connectionString = `postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POS
 const sql = postgres(connectionString, { max: 1 });
 const db = drizzle(sql, { logger: true });
 await migrate(db, { migrationsFolder: './sql/migrations' });
-
+await sql.file('./sql/scripts/triggers.sql').execute();
 export default db;
