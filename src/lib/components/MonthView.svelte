@@ -8,11 +8,14 @@
 	import { createCalendar, melt } from '@melt-ui/svelte';
 	import { CalendarDate, isToday, today } from '@internationalized/date';
 	import { ChevronRight, ChevronLeft } from 'svelte-bootstrap-icons';
-	import { ripple } from 'svelte-ripple-action';
 	import { createEventDispatcher } from 'svelte';
 	import { localTimeZone } from '$lib/stores';
+	import DateCell from './DateCell.svelte';
 
 	const onDateClickDispatch = createEventDispatcher();
+	const onDateDragenterDispatch = createEventDispatcher();
+	const onDateDragleaveDispatch = createEventDispatcher();
+	const onDateDropDispatch = createEventDispatcher();
 
 	function trueOrFalse(falseRate: number): boolean {
 		const randomNum = Math.random(); // Gera um número aleatório entre 0 e 1
@@ -29,17 +32,7 @@
 		locale: 'pt-BR',
 		defaultValue: today(localTimeZone),
 		fixedWeeks: true
-		// preventDeselect: true
 	});
-
-	// value.subscribe((v) => {
-	// 	if (!v || !$value) {
-	// 		return;
-	// 	}
-	// 	onDateClickDispatch('dateClick', {
-	// 		value: v
-	// 	} satisfies DateClickDetail);
-	// });
 </script>
 
 <section class="h-[calc(100lvh-3.5rem)]">
@@ -77,36 +70,40 @@
 							{#each month.weeks as weekDates}
 								<tr>
 									{#each weekDates as date}
-										{@const isDisabled = $isDateDisabled(date) || $isDateUnavailable(date)}
-										<td
-											role="gridcell"
-											aria-disabled={isDisabled}
-											class="p-0 m-0 border-(t r black)"
-											class:opacity-40={isDisabled}
-											use:ripple
-										>
-											<button
-												style="height: calc(calc(100lvh - 168px)/{month.weeks.length});"
-												use:melt={$cell(date, month.value)}
-												class:today={isToday(date, localTimeZone)}
-												on:click|preventDefault={(ev) => {
-													onDateClickDispatch('dateClick', {
+										{@const isDisabled =
+											$isDateDisabled(date) || $isDateUnavailable(date) ? true : false}
+										<DateCell
+											{isDisabled}
+											isToday={isToday(date, localTimeZone)}
+											meltAction={$cell(date, month.value)}
+											dayNumber={date.day}
+											handleClick={(ev) => {
+												onDateClickDispatch('dateClick', {
+													value: date
+												});
+											}}
+											dayRotinas={trueOrFalse(0.8) ? 3 : 0}
+											dropzoneOptions={{
+												dropEffect: 'move',
+												onDropzone: (data, e) => {
+													console.log(data + ' para o dia ' + date.day);
+													onDateDropDispatch('dateDrop', {
 														value: date
 													});
-												}}
-												class="w-full h-full flex flex-col justify-between items-center"
-											>
-												<span class="font-semibold font-sans text-lg text-center">{date.day}</span>
-												{#if trueOrFalse(0.8)}
-													<h3
-														class="bg-accent-500 text-white px-2 py-1 rounded-full text-sm text-black mb-3 font-semibold"
-													>
-														3
-													</h3>
-													<!-- <CircleFill class="w-3 h-3 fill-accent-500 mx-auto w-fit mb-3" /> -->
-												{/if}
-											</button>
-										</td>
+												},
+												onDragenter: (e) => {
+													onDateDragenterDispatch('dateDragenter', {
+														value: date
+													});
+												},
+												onDragleave: (e) => {
+													onDateDragleaveDispatch('dateDragleave', {
+														value: date
+													});
+												},
+												dragoverClass: 'dragover-class'
+											}}
+										/>
 									{/each}
 								</tr>
 							{/each}

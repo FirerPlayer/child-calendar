@@ -10,7 +10,8 @@
 		PersonBadge
 	} from 'svelte-bootstrap-icons';
 	import { page } from '$app/stores';
-	import type { PageServerData } from './$types';
+	import { addToast } from '$lib/components/Toast.svelte';
+
 	type MenuItem = {
 		name: string;
 		href: string;
@@ -40,12 +41,6 @@
 		}
 	];
 	const myCustomRipple = (node: HTMLElement) => ripple(node);
-	// let session: Session;
-	// if ($page.data.session) {
-	// 	session = $page.data.session;
-	// }
-	// export let data: PageServerData;
-	// $: perfil = data.perfil;
 </script>
 
 <div

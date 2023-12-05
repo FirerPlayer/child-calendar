@@ -5,9 +5,21 @@
 	import 'svelte-ripple-action/ripple.css';
 	import './app.css';
 	import { page } from '$app/stores';
-	import { navStack, titleStore } from '$lib/stores';
+	import { navStack, pocketbase, titleStore } from '$lib/stores';
+	import { onMount } from 'svelte';
+	import Toast, { addToast } from '$lib/components/Toast.svelte';
 	page.subscribe((v) => {
 		$navStack.push(v.url.pathname);
+	});
+
+	onMount(async () => {
+		await $pocketbase.health.check().catch((e) => {
+			addToast({
+				title: 'Erro',
+				message: 'Erro ao conectar ao servidor',
+				type: 'error'
+			});
+		});
 	});
 </script>
 
@@ -17,5 +29,6 @@
 
 <!-- <svelte:window on:nav /> -->
 <div class="min-w-screen text-txt-500 bg-bb-500">
+	<Toast />
 	<slot />
 </div>

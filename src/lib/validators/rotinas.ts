@@ -1,4 +1,4 @@
-import { string, object, date } from 'yup';
+import { string, object, date, mixed, ref } from 'yup';
 export const criarRotina = object({
 	nome: string().required().min(4, 'Nome muito curto'),
 	descricao: string().min(4, 'Descrição muito curta'),
@@ -16,13 +16,20 @@ export const userLoginEmail = object({
 });
 
 export const userRegisterEmail = object({
+	nome: string().required().min(4, 'Nome muito curto'),
 	email: string().email('Email inválido').required('Email inválido'),
 	password: string().required().min(6, 'Senha precisa ter no mínimo 6 caracteres'),
-	confirmPassword: string().test(
-		'passwords-match',
-		'As senhas precisam ser iguais',
-		(value, context) => {
-			return value === context.parent.password;
+	passwordConfirm: string()
+		.required('Confirme sua senha')
+		.oneOf([ref('password')], 'Senhas devem ser iguais'),
+	avatar: mixed((input): input is File => input instanceof File).test(
+		'maxSize',
+		'Imagem pode ter no máximo 15MB',
+		(value) => {
+			if (value instanceof File) {
+				return value.size <= 15 * 1024 * 1024;
+			}
+			return true;
 		}
 	)
 });
