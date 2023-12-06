@@ -12,46 +12,43 @@
 
 	titleStore.set('Rotinas');
 	// Local states
-	let drawer2Actioned = false;
+
 	let isMouseOutDrawer2 = false;
-	let isAnyDrawerOpen = false;
 
 	let currentDate: CalendarDate | undefined;
 	const handleDateClick = (ev: CustomEvent) => {
-		if ($open1) {
-			return;
-		}
-		if (isAnyDrawerOpen || drawer2Actioned) {
-			drawer2Actioned = false;
+		if ($open2) {
 			return;
 		}
 		open1.set(true);
+		// openDrawer1();
 		currentDate = (ev.detail as DateClickDetail).value;
 	};
 
 	const {
 		elements: { portalled, overlay, content, title, close },
 		states: { open: open1 }
-	} = createDialog();
+	} = createDialog({
+		closeOnOutsideClick: false
+	});
 	const {
 		elements: { portalled: portalled2, content: content2, title: title2, close: close2 },
 		states: { open: open2 }
-	} = createDialog();
+	} = createDialog({
+		closeOnOutsideClick: false
+	});
 
 	// Drawer states
-	open1.subscribe((value) => {
-		isAnyDrawerOpen = value;
-	});
-	open2.subscribe((value) => {
-		isAnyDrawerOpen = value;
-	});
-	$: console.log({ $open1, $open2, isAnyDrawerOpen });
 </script>
 
 <div use:melt={$portalled}>
-	{#if $open1 && isAnyDrawerOpen}
+	{#if $open1}
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			use:melt={$overlay}
+			on:click|preventDefault={(ev) => {
+				open1.set(false);
+			}}
 			class="fixed inset-0 z-50 bg-black/50"
 			transition:fade={{ duration: 150 }}
 		/>
@@ -78,9 +75,6 @@
 				{/if}
 				<button
 					use:melt={$close}
-					on:m-click={() => {
-						isAnyDrawerOpen = false;
-					}}
 					class="p-2 appearance-none items-center justify-center rounded-full text-primary-800
 						hover:bg-primary-200 focus:shadow-primary-400 focus:outline-none focus:ring-2
 						focus:ring-primary-400"
@@ -159,7 +153,6 @@
 <button
 	on:click={() => {
 		open2.set(true);
-		drawer2Actioned = true;
 	}}
 	class="absolute bottom-4 right-4 p-3 rounded-full bg-primary-500"
 >

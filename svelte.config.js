@@ -19,8 +19,9 @@ const config = {
 		adapter: adapter({
 			strict: false,
 			platform: "cordova",
+			fallback: "index.html",
 		}),
-	}
+	},
 };
 
 export default config;
