@@ -3,11 +3,12 @@
 	import ListRotinas from '$lib/components/ListRotinas.svelte';
 	import MonthView, { type DateClickDetail } from '$lib/components/MonthView.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
-	import { isDragging, localTimeZone, titleStore } from '$lib/stores';
+	import { draggingState, localTimeZone, titleStore } from '$lib/stores';
 	import { getTodayString } from '$lib/utils';
 	import type { CalendarDate } from '@internationalized/date';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { Plus, X } from 'svelte-bootstrap-icons';
+	import { ripple } from 'svelte-ripple-action';
 	import { fade, fly } from 'svelte/transition';
 
 	titleStore.set('Rotinas');
@@ -154,7 +155,7 @@
 	on:click={() => {
 		open2.set(true);
 	}}
-	class="absolute bottom-4 right-4 p-3 rounded-full bg-primary-500"
+	class="fixed bottom-4 right-4 p-3 rounded-full bg-primary-500"
 >
 	<Plus class="w-9 h-9" />
 </button>

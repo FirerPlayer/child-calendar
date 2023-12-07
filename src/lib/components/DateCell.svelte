@@ -40,6 +40,9 @@
 </td>
 
 <style>
+	.today {
+		--uno: bg-primary-500/60 text-black;
+	}
 	.dragover-class {
 		--uno: scale-150 z-50 ring-(2 accent-500) shadow-lg text-black;
 	}

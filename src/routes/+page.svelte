@@ -50,15 +50,17 @@
 	flex
 	flex-col
 	justify-around
-	h-screen
-	items-center"
+	h-100svh
+	items-center
+	overflow-y-hidden
+	"
 >
-	<div class="w-fit flex flex-col items-center">
+	<div class="w-fit max-w-50% flex flex-col items-center">
 		<h1 class="font-[ScholarlyAmbition] text-primary-500 text-8xl">Calendário</h1>
 		<img src={logo} alt="Child Calendar" />
 	</div>
 	<div>
-		<h1 class="text-center text-7xl font-bold mb-4">Menu</h1>
+		<h1 class="text-center text-5xl font-bold mb-2">Menu</h1>
 		<Slider className="p-2" withNavigation>
 			{#each menuItems as item}
 				<div class="flex items-center justify-center">
@@ -73,8 +75,8 @@
 						text-white
 						p-4"
 					>
-						<svelte:component this={item.icon} class="w-34 h-34" />
-						<span class="text-2xl max-w-min text-center font-bold" style="letter-spacing: 4px;"
+						<svelte:component this={item.icon} class="w-30 h-30" />
+						<span class="text-xl max-w-min text-center font-bold" style="letter-spacing: 4px;"
 							>{item.name}</span
 						>
 					</a>
@@ -107,3 +109,9 @@
 		</h3>
 	{/if}
 </div>
+
+<style>
+	:global(body, html) {
+		overflow-y: hidden;
+	}
+</style>

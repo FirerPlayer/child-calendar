@@ -1,4 +1,4 @@
-import { isDragging } from './stores';
+import { draggingState } from './stores';
 
 export type DraggableOptions = {
 	data: string;
@@ -12,7 +12,7 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 
 	const listners = {
 		dragstart: (e: DragEvent) => {
-			isDragging.set(true);
+			draggingState.set(true);
 			if (!e.dataTransfer) return;
 			e.dataTransfer.setData('text/plain', options.data);
 			if (!options.onDragstart) return;
@@ -20,7 +20,7 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 		},
 		dragend: (e: DragEvent) => {
 			// console.log('acabou');
-			isDragging.set(false);
+			draggingState.set(false);
 			if (!options.onDragend) return;
 			options.onDragend(options.data, e);
 		}

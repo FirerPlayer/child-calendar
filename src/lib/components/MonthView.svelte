@@ -8,7 +8,7 @@
 	import { createCalendar, melt } from '@melt-ui/svelte';
 	import { CalendarDate, isToday, today } from '@internationalized/date';
 	import { ChevronRight, ChevronLeft } from 'svelte-bootstrap-icons';
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import { localTimeZone } from '$lib/stores';
 	import DateCell from './DateCell.svelte';
 
@@ -52,7 +52,7 @@
 					<ChevronRight class="w-6 h-6" />
 				</button>
 			</header>
-			<div class="">
+			<div>
 				{#each $months as month}
 					<table use:melt={$grid} class="w-full h-full">
 						<thead aria-hidden="true">
@@ -114,9 +114,3 @@
 		</div>
 	</div>
 </section>
-
-<style>
-	.today {
-		--uno: bg-primary-500/60 text-black;
-	}
-</style>

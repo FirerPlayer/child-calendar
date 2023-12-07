@@ -10,4 +10,23 @@ export const localTimeZone = getLocalTimeZone();
 
 export const pocketbase = writable<Pocketbase>(new Pocketbase(PUBLIC_PB_URL));
 
-export const isDragging = writable<boolean>(false);
+export const draggingState = writable<{ on: boolean; data: Record<string, any> }>({
+	on: false,
+	data: {}
+});
+
+export const onDragging = (data: Record<string, any>) => {
+	draggingState.update((state) => {
+		state.on = true;
+		state.data = data;
+		return state;
+	});
+};
+
+export const offDragging = () => {
+	draggingState.update((state) => {
+		state.on = false;
+		state.data = {};
+		return state;
+	});
+};
