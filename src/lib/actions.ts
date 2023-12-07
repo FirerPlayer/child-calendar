@@ -1,47 +1,10 @@
-import { draggingState } from './stores';
+import { offDragging, onDragging } from './stores';
 
 export type DraggableOptions = {
 	data: string;
 	onDragstart?: (data: string, e: DragEvent) => void;
 	onDragend?: (data: string, e: DragEvent) => void;
 };
-
-export function draggable(node: HTMLElement, options: DraggableOptions) {
-	node.draggable = true;
-	node.style.cursor = 'grab';
-
-	const listners = {
-		dragstart: (e: DragEvent) => {
-			draggingState.set(true);
-			if (!e.dataTransfer) return;
-			e.dataTransfer.setData('text/plain', options.data);
-			if (!options.onDragstart) return;
-			options.onDragstart(options.data, e);
-		},
-		dragend: (e: DragEvent) => {
-			// console.log('acabou');
-			draggingState.set(false);
-			if (!options.onDragend) return;
-			options.onDragend(options.data, e);
-		}
-	};
-
-	Object.entries(listners).forEach(([key, fn]) => {
-		node.addEventListener(key as keyof HTMLElementEventMap, fn as any);
-	});
-
-	return {
-		update(data: string) {
-			options.data = data;
-		},
-
-		destroy() {
-			Object.entries(listners).forEach(([key, fn]) => {
-				node.removeEventListener(key as keyof HTMLElementEventMap, fn as any);
-			});
-		}
-	};
-}
 
 export type DropzoneOptions = {
 	dropEffect: string;
@@ -102,4 +65,93 @@ export function dropzone(
 			});
 		}
 	};
+}
+
+const getHandler = (data: Record<string, any> = {}, { dx, dy }: { dx: number; dy: number }) => {
+	const handleMouseDown = (e: MouseEvent) => {
+		e.preventDefault();
+		onDragging(data);
+		const startPos = {
+			x: e.clientX - dx,
+			y: e.clientY - dy
+		};
+		const element = e.target as HTMLElement;
+		const rect = element.getBoundingClientRect();
+		let { initialWidth, initialHeight } = { initialWidth: rect.width, initialHeight: rect.height };
+
+		const handleMouseMove = (e: MouseEvent) => {
+			const dx = e.clientX - startPos.x;
+			const dy = e.clientY - startPos.y;
+
+			element.style.position = 'absolute';
+			element.style.zIndex = '50';
+			element.style.transform = `translate(${dx}px, ${dy}px)`;
+			element.style.width = `${initialWidth}px`;
+			element.style.height = `${initialHeight}px`;
+		};
+
+		const handleMouseUp = () => {
+			offDragging();
+			document.removeEventListener('mousemove', handleMouseMove);
+			document.removeEventListener('mouseup', handleMouseUp);
+			element.style.position = 'static';
+			element.style.zIndex = '0';
+			element.style.transform = `translate(0px, 0px)`;
+			element.style.width = `${initialWidth}px`;
+			element.style.height = `${initialHeight}px`;
+		};
+
+		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('mouseup', handleMouseUp);
+	};
+
+	const handleTouchStart = (ev: TouchEvent) => {
+		ev.preventDefault();
+		onDragging({ data: 'test' });
+		const touch = ev.touches[0];
+
+		const startPos = {
+			x: touch.clientX - dx,
+			y: touch.clientY - dy
+		};
+		const element = ev.target as HTMLElement;
+		const rect = element.getBoundingClientRect();
+		let { initialWidth, initialHeight } = { initialWidth: rect.width, initialHeight: rect.height };
+
+		const handleTouchMove = (ev: TouchEvent) => {
+			const touch = ev.touches[0];
+			const dx = touch.clientX - startPos.x;
+			const dy = touch.clientY - startPos.y;
+
+			element.style.position = 'absolute';
+			element.style.zIndex = '50';
+			element.style.transform = `translate(${dx}px, ${dy}px)`;
+			element.style.width = `${initialWidth}px`;
+			element.style.height = `${initialHeight}px`;
+		};
+
+		const handleTouchEnd = (ev: TouchEvent) => {
+			offDragging();
+
+			document.removeEventListener('touchmove', handleTouchMove);
+			document.removeEventListener('touchend', handleTouchEnd);
+			element.style.position = 'static';
+			element.style.zIndex = '0';
+			element.style.transform = `translate(0px, 0px)`;
+			element.style.width = `${initialWidth}px`;
+			element.style.height = `${initialHeight}px`;
+		};
+
+		document.addEventListener('touchmove', handleTouchMove);
+		document.addEventListener('touchend', handleTouchEnd);
+	};
+
+	return { handleMouseDown, handleTouchStart };
+};
+
+export function movable(node: HTMLElement, data: Record<string, any> = {}) {
+	let { dx, dy } = { dx: 0, dy: 0 };
+	let { handleMouseDown, handleTouchStart } = getHandler(data, { dx, dy });
+	node.addEventListener('mousedown', handleMouseDown);
+	node.addEventListener('touchstart', handleTouchStart);
 }

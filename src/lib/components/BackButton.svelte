@@ -1,10 +1,14 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import { navStack } from '$lib/stores';
 	import { ArrowLeft } from 'svelte-bootstrap-icons';
 	import { ripple } from 'svelte-ripple-action';
 
 	const goBack = () => {
+		if ($page.route.id?.endsWith('login') || $page.route.id?.endsWith('registro')) {
+			goto('/');
+		}
 		if ($navStack.length <= 1) {
 			goto('/');
 		}

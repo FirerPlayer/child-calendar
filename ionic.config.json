@@ -1,0 +1,7 @@
+{
+  "name": "child-calendar",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "custom"
+}
