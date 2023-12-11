@@ -13,8 +13,6 @@
 	const { form, errors, data } = createForm<InferType<typeof userRegisterEmail>>({
 		extend: validator({ schema: userRegisterEmail }),
 		async onSubmit(formData) {
-			console.log('submited');
-			console.log('values: ', formData);
 			if (!pocketbase) {
 				return;
 			}
@@ -26,9 +24,17 @@
 				})
 				.catch((err) => {
 					if (err.status === 400) {
+						if (err.data.data.email) {
+							addToast({
+								title: 'Erro',
+								message: 'Email já registrado, faça o login',
+								type: 'error'
+							});
+							return;
+						}
 						addToast({
 							title: 'Erro',
-							message: 'Falha ao registrar',
+							message: 'Falha ao registrar: ',
 							type: 'error'
 						});
 					} else {
@@ -71,14 +77,14 @@
 	overflow-y-hidden text-txt-500 bg-bb-500"
 >
 	<!-- <img src={logo} alt="Child calendar logo" class="w-50" /> -->
-	<h1 class="text-6xl font-[SuperBoy] text-orange-500" style="letter-spacing: 4px;">REGISTRO</h1>
+	<h1 class="text-5xl font-[SuperBoy] text-orange-500" style="letter-spacing: 4px;">REGISTRO</h1>
 	<!-- svelte-ignore a11y-missing-attribute -->
 	<form use:form class="flex flex-col justify-center w-full gap-2 py-2 px-8">
 		<!-- AVATAR -->
 		<div class="flex flex-col gap-2 items-center">
 			<label
 				use:ripple
-				class="w-38 h-38 rounded-full flex items-center justify-center
+				class="w-28 h-28 rounded-full flex items-center justify-center
 					border-(~ dark-500) cursor-pointer"
 				class:border-red-5={$errors.avatar}
 			>
@@ -109,7 +115,7 @@
 				type="text"
 				id="nome"
 				name="nome"
-				class="w-full p-5 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
+				class="w-full px-3 py-4 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
 				placeholder="Digite seu nome"
 				class:invalid={$errors.nome}
 			/>
@@ -124,7 +130,7 @@
 				type="email"
 				id="email"
 				name="email"
-				class="w-full p-5 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
+				class="w-full px-3 py-4 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
 				placeholder="Digite seu email"
 				class:invalid={$errors.email}
 			/>
@@ -141,7 +147,7 @@
 				type="password"
 				id="password"
 				name="password"
-				class="w-full p-5 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
+				class="w-full px-3 py-4 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
 				placeholder="Digite sua senha"
 				class:invalid={$errors.password}
 			/>
@@ -156,7 +162,7 @@
 				type="password"
 				id="passwordConfirm"
 				name="passwordConfirm"
-				class="w-full p-5 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
+				class="w-full px-3 py-4 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
 				placeholder="Confirme sua senha"
 				class:invalid={$errors.passwordConfirm}
 			/>

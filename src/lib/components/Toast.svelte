@@ -28,7 +28,7 @@
 	import { fly } from 'svelte/transition';
 </script>
 
-<div use:portal class="w-full fixed bottom-0 z-50 flex flex-col items-end gap-2">
+<div use:portal class="w-full fixed bottom-0 z-9999 flex flex-col items-end gap-2">
 	{#each $toasts as { id, data } (id)}
 		<div
 			use:melt={$content(id)}

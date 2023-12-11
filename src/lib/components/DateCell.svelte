@@ -25,12 +25,16 @@
 		use:dropzone={dropzoneOptions}
 		style="height: calc(calc(100lvh - 168px)/{monthWeeks});"
 		class:today={isToday}
-		class="w-full h-full flex flex-col justify-between items-center"
+		class="w-full h-full flex flex-col justify-between items-center transition-all duration-350"
 	>
-		<span class="font-semibold font-sans text-lg text-center">{dayNumber}</span>
+		<span
+			class="font-semibold font-sans text-lg text-center
+		pointer-events-none touch-none">{dayNumber}</span
+		>
 		{#if dayRotinas}
 			<h3
-				class="bg-accent-500 text-white px-2 py-1 rounded-full text-sm text-black mb-3 font-semibold"
+				class="bg-accent-500 text-white px-2 py-1 rounded-full text-sm
+				text-black mb-3 font-semibold pointer-events-none touch-none"
 			>
 				{dayRotinas}
 			</h3>
@@ -44,6 +48,6 @@
 		--uno: bg-primary-500/60 text-black;
 	}
 	.dragover-class {
-		--uno: scale-150 z-50 ring-(2 accent-500) shadow-lg text-black;
+		--uno: scale-110 z-50 ring-(2 accent-500) shadow-lg text-black bg-bb-300;
 	}
 </style>

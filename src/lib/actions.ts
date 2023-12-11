@@ -1,19 +1,66 @@
-import { offDragging, onDragging } from './stores';
+import { draggingState, offDragging, onDragging } from './stores';
 
 export type DraggableOptions = {
-	data: string;
-	onDragstart?: (data: string, e: DragEvent) => void;
-	onDragend?: (data: string, e: DragEvent) => void;
+	data: Record<string, any>;
+	draggingClass?: string;
+	onDragstart?: (e: DragEvent) => void;
+	onDragend?: (e: DragEvent) => void;
 };
 
 export type DropzoneOptions = {
 	dropEffect: string;
 	dragoverClass: string;
-	onDropzone?: (data: string, e: DragEvent) => void;
+	onDrop?: (e: DragEvent) => void;
 	onDragenter?: (e: DragEvent) => void;
 	onDragleave?: (e: DragEvent) => void;
 };
 
+export function draggable(node: HTMLElement, options: DraggableOptions) {
+	node.draggable = true;
+	node.style.cursor = 'grab';
+	const rect = node.getBoundingClientRect();
+	const { initialWidth, initialHeight } = { initialWidth: rect.width, initialHeight: rect.height };
+
+	const listners = {
+		dragstart: (e: DragEvent) => {
+			onDragging(options.data);
+			const target = e.target as HTMLElement;
+			target.style.width = `${initialWidth}px`;
+			target.style.height = `${initialHeight}px`;
+			//@ts-expect-error
+			let clone: HTMLElement = target.cloneNode(true);
+			clone.style.opacity = '1';
+			clone.classList.add('dragging');
+			document.body.appendChild(clone);
+			e.dataTransfer?.setDragImage(clone, 0, 0);
+			if (!options.onDragstart) return;
+			options.onDragstart(e);
+		},
+		dragend: (e: DragEvent) => {
+			offDragging();
+			const target = e.target as HTMLElement;
+			// target.classList.remove('dragging');
+			target.style.width = `auto`;
+			target.style.height = `auto`;
+			document.body.removeChild(document.querySelector('.dragging') as HTMLElement);
+			if (!options.onDragend) return;
+			options.onDragend(e);
+		}
+	};
+	Object.entries(listners).forEach(([key, fn]) => {
+		node.addEventListener(key as keyof HTMLElementEventMap, fn as any);
+	});
+	return {
+		update(opt: DraggableOptions) {
+			options = opt;
+		},
+		destroy() {
+			Object.entries(listners).forEach(([key, fn]) => {
+				node.removeEventListener(key as keyof HTMLElementEventMap, fn as any);
+			});
+		}
+	};
+}
 export function dropzone(
 	node: HTMLElement,
 	options: DropzoneOptions = {
@@ -23,12 +70,15 @@ export function dropzone(
 ) {
 	const listners = {
 		dragenter: (e: DragEvent) => {
-			(e.target as HTMLElement).classList.add(options.dragoverClass);
+			e.preventDefault();
+			const target = e.target as HTMLElement;
+			target.classList.add(options.dragoverClass);
 			if (options.onDragenter) {
 				options.onDragenter(e);
 			}
 		},
 		dragleave: (e: DragEvent) => {
+			e.preventDefault();
 			(e.target as HTMLElement).classList.remove(options.dragoverClass);
 			if (options.onDragleave) {
 				options.onDragleave(e);
@@ -41,11 +91,10 @@ export function dropzone(
 		},
 		drop: (e: DragEvent) => {
 			e.preventDefault();
-			if (!e.dataTransfer) return;
-			const data = e.dataTransfer.getData('text/plain');
+			offDragging();
 			(e.target as HTMLElement).classList.remove(options.dragoverClass);
-			if (options.onDropzone) {
-				options.onDropzone(data, e);
+			if (options.onDrop) {
+				options.onDrop(e);
 			}
 		}
 	};

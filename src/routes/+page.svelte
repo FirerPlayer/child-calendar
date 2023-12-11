@@ -7,7 +7,7 @@
 		ListCheck,
 		Gear,
 		QuestionSquare,
-		PersonBadge
+		PersonGear
 	} from 'svelte-bootstrap-icons';
 	import { page } from '$app/stores';
 	import { addToast } from '$lib/components/Toast.svelte';
@@ -30,9 +30,9 @@
 			icon: CollectionPlay
 		},
 		{
-			name: 'Configurações',
-			href: '/configuracoes',
-			icon: Gear
+			name: 'Perfil',
+			href: '/perfil',
+			icon: PersonGear
 		},
 		{
 			name: 'Ajuda',

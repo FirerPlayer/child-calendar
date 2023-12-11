@@ -2,7 +2,8 @@
 	import { titleStore } from '$lib/stores';
 	import BackButton from './BackButton.svelte';
 
-	export let className = 'flex gap-1 text-black rounded-br-6 p-2 top-0 left-0 bg-secondary-500';
+	export let className =
+		'flex items-center gap-1 text-black rounded-br-6 p-2 top-0 left-0 bg-secondary-500';
 </script>
 
 <header class={className}>

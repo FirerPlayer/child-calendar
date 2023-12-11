@@ -2,20 +2,23 @@
 	export type DateClickDetail = {
 		value: CalendarDate;
 	};
+
+	export type DateDragFunction<T> = (ev: DragEvent, data?: T) => void;
 </script>
 
 <script lang="ts">
 	import { createCalendar, melt } from '@melt-ui/svelte';
-	import { CalendarDate, isToday, today } from '@internationalized/date';
+	import { CalendarDate, isToday, today, type DateValue } from '@internationalized/date';
 	import { ChevronRight, ChevronLeft } from 'svelte-bootstrap-icons';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { createEventDispatcher } from 'svelte';
 	import { localTimeZone } from '$lib/stores';
 	import DateCell from './DateCell.svelte';
 
 	const onDateClickDispatch = createEventDispatcher();
-	const onDateDragenterDispatch = createEventDispatcher();
-	const onDateDragleaveDispatch = createEventDispatcher();
 	const onDateDropDispatch = createEventDispatcher();
+
+	// export let dateDragenter: DateDragFunction<DateValue> = (ev: DragEvent) => {};
+	// export let dateDragleave: DateDragFunction<DateValue> = (ev: DragEvent) => {};
 
 	function trueOrFalse(falseRate: number): boolean {
 		const randomNum = Math.random(); // Gera um número aleatório entre 0 e 1
@@ -26,7 +29,7 @@
 
 	const {
 		elements: { calendar, heading, grid, cell, prevButton, nextButton },
-		states: { months, headingValue, daysOfWeek, value },
+		states: { months, headingValue, daysOfWeek },
 		helpers: { isDateDisabled, isDateUnavailable }
 	} = createCalendar({
 		locale: 'pt-BR',
@@ -85,19 +88,8 @@
 											dayRotinas={trueOrFalse(0.8) ? 3 : 0}
 											dropzoneOptions={{
 												dropEffect: 'move',
-												onDropzone: (data, e) => {
-													console.log(data + ' para o dia ' + date.day);
+												onDrop: (e) => {
 													onDateDropDispatch('dateDrop', {
-														value: date
-													});
-												},
-												onDragenter: (e) => {
-													onDateDragenterDispatch('dateDragenter', {
-														value: date
-													});
-												},
-												onDragleave: (e) => {
-													onDateDragleaveDispatch('dateDragleave', {
 														value: date
 													});
 												},
