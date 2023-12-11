@@ -398,7 +398,8 @@
         "options": {
           "maxSelect": 1,
           "values": [
-            "crianca. supervisor",
+            "crianca", 
+            "supervisor",
             "admin"
           ]
         }

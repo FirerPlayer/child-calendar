@@ -148,17 +148,17 @@
 			<button
 				use:melt={$trigger(triggerItem.id)}
 				use:ripple
-				class="relative flex items-center justify-center bg-neutral-100 font-medium focus-visible:z-10
-				focus-visible:ring-2 focus-visible:ring-primary-500 p-2 h-12 w-full"
+				class="relative flex items-center justify-center bg-neutral-100 font-bold focus-visible:z-10
+				focus-visible:ring-2 focus-visible:ring-primary-500 p-2 h-12 w-full text-xl"
 			>
-				{triggerItem.title}
 				{#if $currTab === triggerItem.id}
 					<div
 						in:send={{ key: 'trigger' }}
 						out:receive={{ key: 'trigger' }}
-						class="absolute bottom-1 left-1/2 h-1 w-8 -translate-x-1/2 rounded-full bg-primary-400"
+						class="absolute top-1 left-1/2 h-2 w-8 -translate-x-1/2 rounded-full bg-primary-400"
 					/>
 				{/if}
+				{triggerItem.title}
 			</button>
 		{/each}
 	</div>

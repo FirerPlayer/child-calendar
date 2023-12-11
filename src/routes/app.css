@@ -8,6 +8,15 @@ body {
 	/* background-color: rgb(14 165 233); */
 	/* --at-apply: bg-white; */
 	height: 100lvh;
+	--primary-100: rgb(217, 247, 255);
+	--primary-200: rgb(178, 239, 254);
+	--primary-300: rgb(140, 231, 254);
+	--primary-400: rgb(101, 223, 253);
+	--primary-500: rgb(63, 215, 253);
+	--primary-600: rgb(50, 172, 202);
+	--primary-700: rgb(38, 129, 152);
+	--primary-800: rgb(25, 86, 101);
+	--primary-900: rgb(13, 43, 51);
 }
 
 img,
