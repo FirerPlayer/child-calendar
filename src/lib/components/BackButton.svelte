@@ -6,24 +6,20 @@
 	import { ArrowLeft } from 'svelte-bootstrap-icons';
 	import { ripple } from 'svelte-ripple-action';
 
-	const goBack = () => {
-		if ($page.route.id?.endsWith('login') || $page.route.id?.endsWith('registro')) {
-			if (browser) {
-				goto('/');
-			}
-		}
-		if ($navStack.length <= 1) {
-			if (browser) {
-				goto('/');
-			}
+	export let backCallback: (() => string) | undefined = undefined;
+	const getPreviusUrl = () => {
+		if ($navStack.length <= 1 || !$navStack.length) {
+			return '/';
 		}
 		$navStack.pop();
-		if (browser) {
-			goto($navStack.pop() as string);
+		if (backCallback) {
+			let res = backCallback();
+			return res ? res : $navStack.pop();
 		}
+		return $navStack.pop();
 	};
 </script>
 
-<button class="rounded-full" use:ripple on:click={goBack}>
+<a href={getPreviusUrl()} class="rounded-full" use:ripple>
 	<ArrowLeft class="w-10 h-10 rounded-inherit" />
-</button>
+</a>

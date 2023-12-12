@@ -119,7 +119,6 @@
 			return;
 		}
 		const reader = new FileReader();
-		console.log(v.data.name.split('.')[1]);
 		reader.onload = () => {
 			audioAttributes.audio = new Howl({
 				src: reader.result as string

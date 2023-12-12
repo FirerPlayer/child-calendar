@@ -1,110 +1,94 @@
 <script lang="ts">
+	import { pocketbase } from '$lib/stores';
 	import { createCombobox, melt, type ComboboxOptionProps } from '@melt-ui/svelte';
-	import { Check, ChevronDown, ChevronUp } from 'svelte-bootstrap-icons';
+	import { onMount } from 'svelte';
+	import { Check, ChevronDown, ChevronUp, MusicNoteBeamed } from 'svelte-bootstrap-icons';
 	import { fly } from 'svelte/transition';
+	import LoaderSvg from './LoaderSVG.svelte';
+	import pickSound from '$lib/assets/pickSound.wav';
 
-	type Manga = {
-		author: string;
-		title: string;
+	type Som = {
+		nome: string;
+		userId: string;
+		data: string;
 		disabled: boolean;
 	};
+	let defaultSound: Som = {
+		nome: 'Som padrão',
+		data: pickSound,
+		userId: '',
+		disabled: true
+	};
 
-	let mangas: Manga[] = [
-		{
-			author: 'Kentaro Miura',
-			title: 'Berserk',
-			disabled: false
-		},
-		{
-			author: 'ONE',
-			title: 'Mob Psycho 100',
-			disabled: false
-		},
-		{
-			author: 'Hajime Isayama',
-			title: 'Attack on Titan',
-			disabled: false
-		},
-		{
-			author: 'Junji Ito',
-			title: 'Uzumaki',
-			disabled: false
-		},
-		{
-			author: 'Yomi Sarachi',
-			title: 'Steins Gate',
-			disabled: false
-		},
-		{
-			author: 'Tite Kubo',
-			title: 'Bleach',
-			disabled: false
-		},
-		{
-			author: 'Masashi Kishimoto',
-			title: 'Naruto',
-			disabled: true
-		},
-		{
-			author: 'Katsura Hoshino',
-			title: 'D.Gray Man',
-			disabled: false
-		},
-		{
-			author: 'Tsugumi Ohba',
-			title: 'Death Note',
-			disabled: false
-		},
-		{
-			author: 'Hiromu Arakawa',
-			title: 'Fullmetal Alchemist',
-			disabled: false
-		}
-	];
+	let sons: Som[] = [];
+	let loading = false;
+	export let selected: string;
 
-	const toOption = (manga: Manga): ComboboxOptionProps<Manga> => ({
-		value: manga,
-		label: manga.title,
-		disabled: manga.disabled
+	export let title = '';
+
+	const toOption = (som: Som): ComboboxOptionProps<Som> => ({
+		value: som,
+		label: som.nome,
+		disabled: som.disabled
 	});
 
 	const {
 		elements: { menu, input, option, label },
-		states: { open, inputValue, touchedInput, selected },
+		states: { open, inputValue, touchedInput, selected: selectedOption },
 		helpers: { isSelected }
-	} = createCombobox<Manga>({
-		forceVisible: true
+	} = createCombobox<Som>({
+		forceVisible: true,
+		defaultSelected: toOption(defaultSound)
+	});
+	selectedOption.subscribe((option) => {
+		if (option && option.value) {
+			selected = option.value.data;
+		}
 	});
 
 	$: if (!$open) {
-		$inputValue = $selected?.label ?? '';
+		$inputValue = $selectedOption?.label ?? '';
 	}
 
+	const getSounds = async () => {
+		loading = true;
+		let somRes = await $pocketbase.collection('sons').getFullList<Som>({
+			sort: '-created'
+		});
+		sons = [...somRes];
+		sons.push(defaultSound);
+		loading = false;
+	};
+
 	$: filteredMangas = $touchedInput
-		? mangas.filter(({ title, author }) => {
+		? sons.filter(({ nome, data }) => {
 				const normalizedInput = $inputValue.toLowerCase();
 				return (
-					title.toLowerCase().includes(normalizedInput) ||
-					author.toLowerCase().includes(normalizedInput)
+					nome.toLowerCase().includes(normalizedInput) ||
+					data.toLowerCase().includes(normalizedInput)
 				);
 			})
-		: mangas;
+		: sons;
+
+	open.subscribe(async () => {
+		await getSounds();
+	});
 </script>
 
-<div class="flex flex-col gap-1">
+<div class="flex flex-col gap-2">
 	<!-- svelte-ignore a11y-label-has-associated-control - $label contains the 'for' attribute -->
 	<label use:melt={$label}>
-		<span class="text-sm font-medium text-primary-900">Choose your favorite manga:</span>
+		<span class="block text-lg font-bold">{title}</span>
 	</label>
 
 	<div class="relative">
 		<input
 			use:melt={$input}
-			class="flex h-10 items-center justify-between rounded-lg bg-white
-          px-3 pr-12 text-black"
-			placeholder="Best book ever"
+			class="flex h-12 w-full items-center justify-between rounded-lg bg-white
+          p-5 text-black"
+			placeholder="Selecione um som..."
 		/>
-		<div class="absolute right-2 top-1/2 z-10 -translate-y-1/2 text-primary-900">
+		<div class="absolute right-2 top-1/2 z-10 -translate-y-1/2">
 			{#if $open}
 				<ChevronUp class="w-4 h-4" />
 			{:else}
@@ -124,34 +108,37 @@
 			class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
 			tabindex="0"
 		>
-			{#each filteredMangas as manga, index (index)}
+			{#each filteredMangas as som, i (i)}
 				<li
-					use:melt={$option(toOption(manga))}
-					class="relative cursor-pointer scroll-my-2 rounded-md py-2 pl-4 pr-4
-        hover:bg-primary-100
-        data-[highlighted]:bg-primary-200 data-[highlighted]:text-primary-900
-          data-[disabled]:opacity-50"
+					use:melt={$option(toOption(som))}
+					class="relative cursor-pointer scroll-my-2 rounded-md py-2 px-4
+        hover:bg-primary-100 data-[disabled]:opacity-50 overflow-hidden"
 				>
-					{#if $isSelected(manga)}
-						<div class="check absolute left-2 top-1/2 z-10 text-primary-900">
-							<Check class="w-4 h-4" />
+					<div class:selected={$isSelected(som)} class="p-1">
+						<div class="flex gap-2 items-center">
+							<MusicNoteBeamed class="w-7 h-7" />
+							<p class="font-medium overflow-hidden w-[200px]">{som.nome}</p>
 						</div>
-					{/if}
-					<div class="pl-4">
-						<span class="font-medium">{manga.title}</span>
-						<span class="block text-sm opacity-75">{manga.author}</span>
+						<p
+							class="text-sm opacity-75 text-ellipsis overflow-hidden whitespace-nowrap max-w-full"
+						>
+							{som.data}
+						</p>
 					</div>
 				</li>
 			{:else}
-				<li class="relative cursor-pointer rounded-md py-1 pl-8 pr-4">No results found</li>
+				{#if loading}
+					<LoaderSvg class="w-8 h-8" />
+				{:else}
+					<li class="relative cursor-pointer rounded-md py-1 pl-8 pr-4">Sem resultados</li>
+				{/if}
 			{/each}
 		</div>
 	</ul>
 {/if}
 
 <style lang="postcss">
-	.check {
-		@apply absolute left-2 top-1/2 text-primary-500;
-		translate: 0 calc(-50% + 1px);
+	.selected {
+		--uno: bg-primary-300 text-primary-900 font-semibold;
 	}
 </style>

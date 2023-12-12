@@ -24,7 +24,6 @@
 	const { form, errors } = createForm<InferType<typeof userLoginEmail>>({
 		extend: validator({ schema: userLoginEmail }),
 		async onSubmit({ email, password }) {
-			console.log('values: ', { email, password });
 			await $pocketbase
 				.collection('users')
 				.authWithPassword(email, password)

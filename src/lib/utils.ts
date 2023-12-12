@@ -21,14 +21,14 @@ export function generateShades(rgbColor: number[]) {
 	return res;
 }
 
-export const updateAppColor = (color: number[]) => {
+export const updateElementPrimaryColor = (element: HTMLElement, color: number[]) => {
 	const shades = generateShades(color);
 
 	Object.entries(shades).forEach(([k, v]) => {
 		if (k == '950' || k == '50') {
 			return;
 		}
-		document.body.style.setProperty(`--primary-${k}`, v);
+		element.style.setProperty(`--primary-${k}`, v);
 	});
 };
 
@@ -49,7 +49,6 @@ export const showNativeDatePicker = async (onDateSelected: (date: string) => voi
 };
 
 export const checkAuth = async () => {
-	console.log('check auth');
 	const pb = get(pocketbase);
 
 	// await pb

@@ -4,7 +4,7 @@ import Pocketbase from 'pocketbase';
 import { ClientResponseError } from 'pocketbase';
 import { PUBLIC_PB_URL } from '$env/static/public';
 import pickSound from '$lib/assets/pickSound.wav';
-import { isMobile, updateAppColor } from './utils';
+import { isMobile, updateElementPrimaryColor } from './utils';
 
 export const navStack = readable<string[]>([]);
 export const titleStore = writable<string>('Inicio');
@@ -31,27 +31,29 @@ export type AppConfig = {
 	dragAndDropSound: string;
 	showClockOnRotinaStart: boolean;
 };
-let initalConfig: AppConfig = {
+export let defaultConfig: AppConfig = {
 	preferedColor: [63, 215, 253],
 	dragAndDropSound: pickSound,
 	showClockOnRotinaStart: true
 };
+export let initalConfig: AppConfig = defaultConfig;
 
 if (
 	!localStorage.getItem('appConfig') ||
 	localStorage.getItem('appConfig') === null ||
 	localStorage.getItem('appConfig') === '{}'
 ) {
-	localStorage.setItem('appConfig', JSON.stringify(initalConfig));
+	localStorage.setItem('appConfig', JSON.stringify(defaultConfig));
 } else {
 	initalConfig = JSON.parse(localStorage.getItem('appConfig')!);
 }
 
-export const appConfig = writable<AppConfig>(initalConfig);
+export const saveConfig = (config: AppConfig) => {
+	localStorage.setItem('appConfig', JSON.stringify(config));
+	appConfig.set(config);
+};
 
-appConfig.subscribe((value) => {
-	localStorage.setItem('appConfig', JSON.stringify(value));
-});
+export const appConfig = writable<AppConfig>(initalConfig);
 
 // localStorage.setItem('appConfig', JSON.stringify({}));
 
@@ -61,8 +63,8 @@ export const offDragging = () => {
 		return state;
 	});
 };
-export const preferedColor = writable<number[]>(get(appConfig).preferedColor);
+// export const preferedColor = writable<number[]>(initalConfig.preferedColor);
 
-preferedColor.subscribe((value) => {
-	updateAppColor(value);
-});
+// preferedColor.subscribe((value) => {
+// 	updateElementPrimaryColor(value);
+// });

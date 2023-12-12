@@ -1,18 +1,33 @@
 <script lang="ts">
+	import ComboBox from '$lib/components/ComboBox.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
-	import { appConfig, preferedColor, titleStore } from '$lib/stores';
+	import {
+		appConfig,
+		// preferedColor,
+		saveConfig,
+		titleStore,
+		type AppConfig,
+		initalConfig
+	} from '$lib/stores';
+	import { updateElementPrimaryColor } from '$lib/utils';
 	import { createSlider, melt } from '@melt-ui/svelte';
 	import { ContrastRatioChecker } from 'contrast-ratio-checker';
+	import { onMount } from 'svelte';
 	import { ripple } from 'svelte-ripple-action';
+	import { writable } from 'svelte/store';
 	import { scale } from 'svelte/transition';
 
 	titleStore.set('Configurações');
 	let saved = false;
+	let configChanged: boolean;
+
+	const tempConfig = { ...initalConfig };
+
 	const {
 		elements: { root: rootR, thumb: thumbR },
 		states: { value: R }
 	} = createSlider({
-		defaultValue: [$preferedColor[0]],
+		defaultValue: [initalConfig.preferedColor[0]],
 		min: 0,
 		max: 255
 	});
@@ -20,7 +35,7 @@
 		elements: { root: rootG, thumb: thumbG },
 		states: { value: G }
 	} = createSlider({
-		defaultValue: [$preferedColor[1]],
+		defaultValue: [initalConfig.preferedColor[1]],
 		min: 0,
 		max: 255
 	});
@@ -28,7 +43,7 @@
 		elements: { root: rootB, thumb: thumbB },
 		states: { value: B }
 	} = createSlider({
-		defaultValue: [$preferedColor[2]],
+		defaultValue: [initalConfig.preferedColor[2]],
 		min: 0,
 		max: 255
 	});
@@ -37,36 +52,37 @@
 
 	$: currColor = [$R[0], $G[0], $B[0]];
 	$: {
-		preferedColor.set(currColor);
+		// preferedColor.set(currColor);
+		tempConfig.preferedColor = currColor;
 	}
 	$: currContrastRatio = contrastChecker.getContrastRatioByRgb(
 		{ red: 0, green: 4, blue: 5 },
 		{ red: $R[0], green: $G[0], blue: $B[0] }
 	);
-	const saveConfig = () => {
-		appConfig.update((c) => {
-			c.preferedColor = currColor;
-			return c;
-		});
-	};
-	const handleSalvar = () => {
-		saveConfig();
-		saved = true;
-	};
-	const handleBeforeunload = (ev: BeforeUnloadEvent) => {
-		if (!saved) {
-			ev.preventDefault();
-			ev.returnValue = true;
-		}
+
+	// const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+	// 	// e.preventDefault();
+	// 	// console.log(JSON.stringify(tempConfig));
+	// 	// console.log(JSON.stringify(tempConfig) !== JSON.stringify($appConfig));
+	// 	// e.preventDefault();
+	// 	if (JSON.stringify(tempConfig) !== JSON.stringify($appConfig)) {
+	// 		console.log('não salvou');
+	// 		preferedColor.set($appConfig.preferedColor);
+	// 		updateElementPrimaryColor($appConfig.preferedColor);
+	// 	}
+	// };
+	// console.log($appConfig.preferedColor);
+
+	const handleSalvar = (ev: MouseEvent) => {
+		saveConfig(tempConfig);
 	};
 </script>
 
-<svelte:window on:beforeunload={handleBeforeunload} />
+<!-- <svelte:window on:beforeunload={handleBeforeUnload} /> -->
 
 <TopBar />
 <div class="flex-(~ col) gap-3 h-[calc(100vh-3.5rem)] p-8">
 	<h1 class="block text-lg font-bold">Cor preferida</h1>
-
 	<div class="flex-(~ col) gap-4 bg-primary-500 p-3 rounded-lg">
 		<div class="flex gap-2 w-full">
 			<input
@@ -128,11 +144,13 @@
 			Cuidado com a combinação de cores. <br /> O texto pode ficar ilegivel.
 		</h3>
 	{/if}
-	<div>
+	<!-- <div>
 		<h1 class="block text-lg font-bold">Som para mover as rotinas</h1>
-	</div>
+	</div> -->
+	<ComboBox bind:selected={tempConfig.dragAndDropSound} title="Som para mover as rotinas" />
 	<button
 		use:ripple
+		on:click={handleSalvar}
 		title="Salvar alterações"
 		class="w-full bg-primary-400 p-5 font-semibold text-xl rounded-lg
 		focus:ring-2 focus:ring-primary-500 mt-auto"

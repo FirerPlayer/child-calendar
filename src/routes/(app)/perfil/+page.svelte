@@ -1,12 +1,10 @@
 <script lang="ts">
 	import TopBar from '$lib/components/TopBar.svelte';
-	import { appConfig, isMobileDevie, pocketbase, preferedColor, titleStore } from '$lib/stores';
-	import { createDialog, createDropdownMenu, createSlider, melt } from '@melt-ui/svelte';
+	import { isMobileDevie, pocketbase, titleStore } from '$lib/stores';
+	import { createDialog, createDropdownMenu, melt } from '@melt-ui/svelte';
 	import { createForm } from 'felte';
 	import {
 		CalendarDate,
-		Calendar2,
-		Person,
 		PersonFill,
 		X,
 		ThreeDotsVertical,
@@ -18,7 +16,6 @@
 	import { validator } from '@felte/validator-yup';
 	import { DateFormatter } from '@internationalized/date';
 	import { ripple } from 'svelte-ripple-action';
-	import { ContrastRatioChecker } from 'contrast-ratio-checker';
 	import { logOut, showNativeDatePicker } from '$lib/utils';
 	import { addToast } from '$lib/components/Toast.svelte';
 
@@ -48,7 +45,7 @@
 				.then((res) => {
 					addToast({
 						title: 'Sucesso',
-						message: 'Alteraçoes salva!',
+						message: 'Alterações salvas!',
 						type: 'success'
 					});
 				})
@@ -61,10 +58,6 @@
 					console.error(err);
 				});
 		}
-	});
-	data.subscribe((v) => {
-		console.log(v.dataNascimento);
-		return v;
 	});
 	let profileImgData: { src: string; alt: string; title?: string } = {
 		src: '',

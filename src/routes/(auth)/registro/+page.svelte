@@ -58,7 +58,7 @@
 				});
 		},
 		onError(error) {
-			console.log('error: ', error);
+			console.log('error at registro: ', error);
 		}
 	});
 	titleStore.set('Registro');
