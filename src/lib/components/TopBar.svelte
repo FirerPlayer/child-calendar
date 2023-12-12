@@ -3,7 +3,7 @@
 	import BackButton from './BackButton.svelte';
 
 	export let className =
-		'flex items-center gap-1 text-black rounded-br-6 p-2 top-0 left-0 bg-secondary-500';
+		'flex items-center gap-1 text-black rounded-br-6 p-2 top-0 left-0 bg-primary-500';
 </script>
 
 <header class={className}>

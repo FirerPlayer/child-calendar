@@ -1,6 +1,6 @@
 <script lang="ts">
 	import logo from '$lib/assets/logo.webp';
-	import { userLoginEmail } from '$lib/validators/rotinas';
+	import { userLoginEmail } from '$lib/validators/usuario';
 	import { createForm } from 'felte';
 	import { BoxArrowInRight, Google } from 'svelte-bootstrap-icons';
 	import type { InferType } from 'yup';

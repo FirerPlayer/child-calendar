@@ -8,6 +8,7 @@
 	import { navStack, pocketbase, titleStore } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import Toast, { addToast } from '$lib/components/Toast.svelte';
+	import { ClientResponseError } from 'pocketbase';
 	page.subscribe((v) => {
 		$navStack.push(v.url.pathname);
 	});
@@ -20,6 +21,9 @@
 				type: 'error'
 			});
 		});
+		// if ($pocketbase.authStore.isValid) {
+
+		// }
 	});
 </script>
 

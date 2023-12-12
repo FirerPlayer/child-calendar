@@ -1,7 +1,10 @@
 import { CalendarDate, DateFormatter } from '@internationalized/date';
-import { localTimeZone, pocketbase } from './stores';
-import { getContext, hasContext } from 'svelte';
-import type Pocketbase from 'pocketbase';
+import { getColors } from 'theme-colors';
+import { DatePicker } from '@capacitor-community/date-picker';
+import type { DatePickerTheme } from '@capacitor-community/date-picker';
+import { goto } from '$app/navigation';
+import { get } from 'svelte/store';
+import { pocketbase } from './stores';
 
 export const getTodayString = (value: Date) =>
 	new DateFormatter('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).format(value);
@@ -13,19 +16,69 @@ export const hexToRgb = (hex: string): number[] => {
 export const rgbToCss = (rgb: number[]): string => {
 	return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
 };
-export function generateShades(hexColor: string): string[] {
-	// Converte o valor hexadecimal para RGB
-
-	const baseRgb = hexToRgb(hexColor);
-
-	// Gera as 9 sombras (shades)
-	const shades = Array.from({ length: 9 }, (_, index) => {
-		const shadeValue = 100 - index * 10;
-		const adjustedRgb = baseRgb.map((val) =>
-			Math.max(0, Math.min(255, Math.round(val * (shadeValue / 100))))
-		);
-		return rgbToCss(adjustedRgb);
-	});
-
-	return shades;
+export function generateShades(rgbColor: number[]) {
+	const res = getColors(`${rgbColor[0]}, ${rgbColor[1]}, ${rgbColor[2]}`);
+	return res;
 }
+
+export const updateAppColor = (color: number[]) => {
+	const shades = generateShades(color);
+
+	Object.entries(shades).forEach(([k, v]) => {
+		if (k == '950' || k == '50') {
+			return;
+		}
+		document.body.style.setProperty(`--primary-${k}`, v);
+	});
+};
+
+const selectedTheme: DatePickerTheme = 'light';
+export const showNativeDatePicker = async (onDateSelected: (date: string) => void) => {
+	await DatePicker.present({
+		mode: 'date',
+		locale: 'pt_BR',
+		date: getTodayString(new Date()),
+		theme: selectedTheme,
+		ios: {
+			format: 'dd/MM/yyyy'
+		},
+		android: {
+			format: 'dd/MM/yyyy'
+		}
+	}).then(({ value }) => onDateSelected(value));
+};
+
+export const checkAuth = async () => {
+	console.log('check auth');
+	const pb = get(pocketbase);
+
+	// await pb
+	// 	.collection('users')
+	// 	.getOne(pb.authStore.model?.id)
+	// 	.catch((error) => {
+	// 		if (error instanceof ClientResponseError) {
+	// 			if (error.status === 404) {
+	// 				addToast({
+	// 					title: 'Erro',
+	// 					message: 'Usuario não encontrado',
+	// 					type: 'error'
+	// 				});
+	// 			}
+	// 			pb.authStore.clear();
+	// 			goto('/login');
+	// 		}
+	// 	});
+
+	if (!pb.authStore.isValid) {
+		goto('/login');
+	}
+};
+export function isMobile(): boolean {
+	const userAgent = navigator.userAgent;
+	return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+}
+
+export const logOut = () => {
+	get(pocketbase).authStore.clear();
+	goto('/login');
+};

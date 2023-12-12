@@ -7,7 +7,8 @@
 		ListCheck,
 		Gear,
 		QuestionSquare,
-		PersonGear
+		PersonGear,
+		PersonFill
 	} from 'svelte-bootstrap-icons';
 	import { page } from '$app/stores';
 	import { addToast } from '$lib/components/Toast.svelte';
@@ -32,12 +33,12 @@
 		{
 			name: 'Perfil',
 			href: '/perfil',
-			icon: PersonGear
+			icon: PersonFill
 		},
 		{
-			name: 'Ajuda',
-			href: '/ajuda',
-			icon: QuestionSquare
+			name: 'Configurações',
+			href: '/configuracoes',
+			icon: Gear
 		}
 	];
 	const myCustomRipple = (node: HTMLElement) => ripple(node);

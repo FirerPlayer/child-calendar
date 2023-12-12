@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { userRegisterEmail } from '$lib/validators/rotinas';
+	import { userRegisterEmail } from '$lib/validators/usuario';
 	import { createForm } from 'felte';
 	import { PersonFill, RocketTakeoff } from 'svelte-bootstrap-icons';
 	import type { InferType } from 'yup';
@@ -21,6 +21,16 @@
 				.create(formData)
 				.then(() => {
 					goto('/');
+				})
+				.then((res) => {
+					addToast({
+						title: 'Sucesso',
+						message: 'Conta criada com sucesso, agora faça o login.',
+						type: 'success'
+					});
+					setTimeout(() => {
+						goto('/login');
+					}, 1000);
 				})
 				.catch((err) => {
 					if (err.status === 400) {
