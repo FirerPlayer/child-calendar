@@ -9,6 +9,7 @@
 	import { goto } from '$app/navigation';
 	import { addToast } from '$lib/components/Toast.svelte';
 	import { ripple } from 'svelte-ripple-action';
+	import ImageLazy from '$lib/components/ImageLazy.svelte';
 
 	const { form, errors, data } = createForm<InferType<typeof userRegisterEmail>>({
 		extend: validator({ schema: userRegisterEmail }),
@@ -99,7 +100,10 @@
 				class:border-red-5={$errors.avatar}
 			>
 				{#if profileImgData.src != '' && !$errors.avatar}
-					<img {...profileImgData} />
+					<ImageLazy {...profileImgData}>
+						<PersonFill class="w-20 h-20" />
+					</ImageLazy>
+					<!-- <img {...profileImgData} /> -->
 				{:else}
 					<PersonFill class="w-20 h-20" />
 				{/if}

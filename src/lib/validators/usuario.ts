@@ -16,16 +16,13 @@ export const updateUser = object({
 	dataNascimento: string().min(10, 'Data inválida'),
 	profissao: string().required().min(3, 'Profissão muito curta')
 });
-// mixed((input: Date): input is Date => input instanceof Date).test(
-// 	'min',
-// 	'Data inválida',
-// 	(value) => {
-// 		if (value instanceof Date) {
-// 			return value.getTime() <= new Date().getTime();
-// 		}
-// 		return true;
-// 	}
-// ),
+
+export const sendChangeEmail = object({
+	email: string().email('Email inválido').required('Email inválido')
+});
+export const confirmEmailChange = object({
+	password: string().required().min(6, 'Senha precisa ter no mínimo 6 caracteres')
+});
 
 export const userLoginEmail = object({
 	email: string().required('Email inválido').email('Email inválido'),

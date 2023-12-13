@@ -5,6 +5,8 @@ import type { DatePickerTheme } from '@capacitor-community/date-picker';
 import { goto } from '$app/navigation';
 import { get } from 'svelte/store';
 import { pocketbase } from './stores';
+import { addToast } from './components/Toast.svelte';
+import { ClientResponseError } from 'pocketbase';
 
 export const getTodayString = (value: Date) =>
 	new DateFormatter('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).format(value);
@@ -50,27 +52,11 @@ export const showNativeDatePicker = async (onDateSelected: (date: string) => voi
 
 export const checkAuth = async () => {
 	const pb = get(pocketbase);
-
-	// await pb
-	// 	.collection('users')
-	// 	.getOne(pb.authStore.model?.id)
-	// 	.catch((error) => {
-	// 		if (error instanceof ClientResponseError) {
-	// 			if (error.status === 404) {
-	// 				addToast({
-	// 					title: 'Erro',
-	// 					message: 'Usuario não encontrado',
-	// 					type: 'error'
-	// 				});
-	// 			}
-	// 			pb.authStore.clear();
-	// 			goto('/login');
-	// 		}
-	// 	});
-
 	if (!pb.authStore.isValid) {
 		goto('/login');
 	}
+
+	return await pb.collection('users').getOne(pb.authStore.model?.id);
 };
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;

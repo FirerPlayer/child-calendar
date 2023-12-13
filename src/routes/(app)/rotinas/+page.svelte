@@ -8,7 +8,6 @@
 	import type { CalendarDate } from '@internationalized/date';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import { ArrowsMove, Plus, X } from 'svelte-bootstrap-icons';
-	import { ripple } from 'svelte-ripple-action';
 	import { fade, fly } from 'svelte/transition';
 
 	titleStore.set('Rotinas');
@@ -118,7 +117,7 @@
 			<ArrowsMove class="w-28 h-28 text-white m-auto mt-5" />
 		</div>
 	{/if}
-	<!-- {#if $open2} -->
+
 	<div
 		use:melt={$content2}
 		on:dragleave={() => {
@@ -128,10 +127,6 @@
 			focus:outline-none flex-(~ col) gap-2 border-(t-2 bb-600) transition-all duration-350"
 		style="transform: translateY({$open2 ? '0' : '100%'});"
 	>
-		<!-- transition:fly={{
-			y: '100%',
-			duration: 300
-		}} -->
 		<div
 			use:melt={$title2}
 			class="w-full bg-primary-500 rounded-4 p-2 px-5 shadow-md flex items-center justify-between"
@@ -149,12 +144,9 @@
 		</div>
 		<ImagensRotinasViews />
 	</div>
-	<!-- {/if} -->
 </div>
 
-<TopBar>
-	<h1>oi</h1>
-</TopBar>
+<TopBar></TopBar>
 <MonthView
 	on:dateClick={handleDateClick}
 	on:dateDrop={(e) => {

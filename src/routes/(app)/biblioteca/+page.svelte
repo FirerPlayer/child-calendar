@@ -1,8 +1,8 @@
 <script lang="ts">
 	import TopBar from '$lib/components/TopBar.svelte';
-	import { titleStore } from '$lib/stores';
+	import { pocketbase, titleStore } from '$lib/stores';
 	import { createDialog, createTabs, melt } from '@melt-ui/svelte';
-	import { FileEarmarkPlus, X } from 'svelte-bootstrap-icons';
+	import { FileEarmarkPlus, Image, MusicNoteBeamed, X } from 'svelte-bootstrap-icons';
 	import { ripple } from 'svelte-ripple-action';
 	import { Howl } from 'howler';
 	import { cubicInOut } from 'svelte/easing';
@@ -10,6 +10,9 @@
 	import audioPick from '$lib/assets/pickSound.wav';
 	import MusicPlayer from '$lib/components/MusicPlayer.svelte';
 	import CriarMidiaForm from '$lib/components/CriarMidiaForm.svelte';
+	import LoaderSvg from '$lib/components/LoaderSVG.svelte';
+	import type { RecordModel } from 'pocketbase';
+	// import BiggerPicture from 'bigger-picture/svelte';
 
 	titleStore.set('Biblioteca');
 
@@ -30,12 +33,6 @@
 		easing: cubicInOut
 	});
 
-	let items = Array.from({ length: 10 }, (_, i) => ({
-		id: i,
-		title: `Imagem ${i + 1}`,
-		alt: `Descricao ${i + 1}`,
-		src: `https://picsum.photos/id/${i + 1}/400/300`
-	}));
 	let items2 = Array.from({ length: 20 }, (_, i) => {
 		const audio = new Howl({ src: audioPick });
 
@@ -53,6 +50,13 @@
 	} = createDialog({
 		closeOnOutsideClick: false
 	});
+	const mapFiles = (v: RecordModel) => {
+		return {
+			...v,
+			data: $pocketbase.files.getUrl(v, v.data),
+			nome: v.nome as string
+		};
+	};
 </script>
 
 <div use:melt={$portalled}>
@@ -115,7 +119,43 @@
 >
 	<div use:melt={$content('imagens')} class="bg-bb-500 p-3 h-[calc(100svh-6.5rem)]">
 		<!-- imagens -->
-		<div
+		{#await $pocketbase.collection('imagens').getFullList({ sort: '-created' })}
+			<div class="w-full h-full flex-(~ col) items-center justify-center">
+				<LoaderSvg class="w-16 h-16" />
+			</div>
+		{:then imagens}
+			{@const imgs = imagens.map(mapFiles)}
+			{#if !imgs.length}
+				<div class="w-full h-full flex-(~ col) items-center justify-center">
+					<Image class="w-20 h-20 opacity-40" />
+					<h5 class="font-semibold text-center">Sem imagens para exibir. <br /> Adicione uma!</h5>
+				</div>
+			{:else}
+				<div
+					class="grid grid-cols-2 md:grid-cols-4 grid-flow-row items-center place-content-start
+				gap-5 overflow-y-auto h-full"
+				>
+					{#each imgs as im, i (i)}
+						<div class="flex-(~ col) gap-1 items-center">
+							<img
+								draggable="false"
+								src={im.data}
+								alt={im.nome}
+								title={im.nome}
+								class="object-cover w-36 h-36 md:w-42 md:h-42"
+							/>
+
+							<h3 class="font-medium max-w-20 overflow-hidden whitespace-nowrap text-ellipsis">
+								{im.nome}
+							</h3>
+						</div>
+					{/each}
+				</div>
+			{/if}
+		{:catch error}
+			<h2 class="text-red">Algum erro ocorreu: <br /> {error}</h2>
+		{/await}
+		<!-- <div
 			class="grid grid-cols-2 md:grid-cols-4 grid-flow-row items-center
 			gap-5 overflow-y-auto h-full"
 		>
@@ -125,19 +165,36 @@
 					<h3 class="font-medium">{im.title}</h3>
 				</div>
 			{/each}
-		</div>
+		</div> -->
 	</div>
+
 	<div use:melt={$content('sons')} class="h-[calc(100svh-6.5rem)] bg-bb-500 p-3">
+		{#await $pocketbase.collection('sons').getFullList({ sort: '-created' })}
+			<div class="w-full h-full flex-(~ col) items-center justify-center">
+				<LoaderSvg class="w-16 h-16" />
+			</div>
+		{:then sons}
+			{@const audios = sons.map(mapFiles)}
+			{#if !audios.length}
+				<div class="w-full h-full flex-(~ col) items-center justify-center">
+					<MusicNoteBeamed class="w-20 h-20 opacity-40" />
+					<h5 class="font-semibold text-center">Sem imagens para exibir. <br /> Adicione uma!</h5>
+				</div>
+			{:else}
+				{#each audios as aud, i (i)}
+					<MusicPlayer title={aud.nome} audio={new Howl({ src: aud.data })} />
+				{/each}
+			{/if}
+		{:catch error}
+			<h2 class="text-red">Algum erro ocorreu: <br /> {error}</h2>
+		{/await}
 		<!-- sons -->
 		<div
 			class="flex-(~ col) gap-5 items-center
 			overflow-y-auto h-full"
-		>
-			{#each items2 as aud (aud.id)}
-				<MusicPlayer title={aud.title} audio={aud.audio} />
-			{/each}
-		</div>
+		></div>
 	</div>
+
 	<div
 		use:melt={$list}
 		class="fixed bottom-0 w-100lvw flex shrink-0 overflow-hidden bag-bb-500

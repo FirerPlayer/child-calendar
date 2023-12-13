@@ -6,16 +6,11 @@
 	import { ArrowLeft } from 'svelte-bootstrap-icons';
 	import { ripple } from 'svelte-ripple-action';
 
-	export let backCallback: (() => string) | undefined = undefined;
 	const getPreviusUrl = () => {
 		if ($navStack.length <= 1 || !$navStack.length) {
 			return '/';
 		}
 		$navStack.pop();
-		if (backCallback) {
-			let res = backCallback();
-			return res ? res : $navStack.pop();
-		}
 		return $navStack.pop();
 	};
 </script>

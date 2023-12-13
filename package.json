@@ -54,6 +54,7 @@
 		"@node-rs/bcrypt": "^1.7.3",
 		"@types/howler": "^2.2.11",
 		"@unocss/reset": "^0.57.7",
+		"bigger-picture": "^1.1.12",
 		"blaze-slider": "^1.9.3",
 		"contrast-ratio-checker": "^1.1.7",
 		"felte": "^1.2.12",

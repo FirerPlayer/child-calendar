@@ -2,7 +2,7 @@
 	import logo from '$lib/assets/logo.webp';
 	import { userLoginEmail } from '$lib/validators/usuario';
 	import { createForm } from 'felte';
-	import { BoxArrowInRight, Google } from 'svelte-bootstrap-icons';
+	import { BoxArrowInRight, Envelope, Google, Key } from 'svelte-bootstrap-icons';
 	import type { InferType } from 'yup';
 	import { validator } from '@felte/validator-yup';
 	import { slide } from 'svelte/transition';
@@ -74,7 +74,7 @@
 </script>
 
 <div
-	class="flex flex-col justify-center items-center h-100svh
+	class="flex flex-col gap-1 justify-center items-center h-100svh
 text-txt-500 bg-bb-500 overflow-y-hidden"
 >
 	<!-- <img
@@ -83,12 +83,16 @@ text-txt-500 bg-bb-500 overflow-y-hidden"
 		class="max-w-[clamp(128px,50vw,256px)] pointer-events-none"
 	/> -->
 	<h1 class="text-7xl font-[SuperBoy] text-orange-500" style="letter-spacing: 4px;">LOGIN</h1>
-	<form use:form class="flex flex-col justify-center w-full gap-2 py-4 px-8">
+	<form use:form class="flex flex-col justify-center w-full gap-3 py-4 px-8">
 		<div class="flex flex-col gap-2">
-			<label for="email" class="text-txt-500 font-bold">Email</label>
+			<label for="email" class="text-txt-500 font-bold flex items-center gap-3">
+				<Envelope class="w-6 h-6" />
+				Email
+			</label>
 			<input
 				type="email"
 				name="email"
+				id="email"
 				class="w-full px-3 py-4 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
 				placeholder="Digite seu email"
 				class:invalid={$errors.email}
@@ -98,10 +102,14 @@ text-txt-500 bg-bb-500 overflow-y-hidden"
 			{/if}
 		</div>
 		<div class="flex flex-col gap-2">
-			<label for="password" class="text-txt-500 font-bold">Senha</label>
+			<label for="password" class="text-txt-500 font-bold flex items-center gap-3">
+				<Key class="w-6 h-6" />
+				Senha
+			</label>
 			<input
 				type="password"
 				name="password"
+				id="password"
 				class="w-full px-3 py-4 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
 				placeholder="Digite sua senha"
 				class:invalid={$errors.password}
@@ -122,19 +130,18 @@ text-txt-500 bg-bb-500 overflow-y-hidden"
 	</form>
 	<div class="flex-(~ col) items-center gap-2">
 		<a
+			href="/recuperarSenha"
+			class="text-txt-500 font-semibold underline
+		text-lg"
+		>
+			Esqueci minha senha
+		</a>
+		<a
 			href="/registro"
 			class="text-txt-500 font-semibold underline
 		text-lg">Não tem uma conta? Crie uma</a
 		>
 		<div use:melt={$horizontal} class="divider font-semibold text-xl">OU</div>
-
-		<!-- <div
-			use:melt={$horizontal}
-			class="bg-txt-500/40 h-4 gap-4 whitespace-nowrap
-		text-center align-middle overflow-visible"
-		>
-			<span class="z-10"> OU </span>
-		</div> -->
 
 		<h2 class="text-xl font-semibold text-center p-0 m-0">Entre com</h2>
 		<button

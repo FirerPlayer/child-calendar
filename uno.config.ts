@@ -24,16 +24,17 @@ export default defineConfig({
 				900: '#000101'
 			},
 			bb: {
-				100: '#fbfeff',
-				200: '#f7fdff',
-				300: '#f3fdff',
-				400: '#effcff',
-				500: '#ebfbff',
-				600: '#bcc9cc',
-				700: '#8d9799',
-				800: '#5e6466',
-				900: '#2f3233'
+				100: '#fffefc',
+				200: '#fefdf9',
+				300: '#fefbf7',
+				400: '#fdfaf4',
+				500: '#fdf9f1',
+				600: '#cac7c1',
+				700: '#989591',
+				800: '#656460',
+				900: '#333230'
 			},
+
 			primary: {
 				100: 'var(--primary-100)',
 				200: 'var(--primary-200)',

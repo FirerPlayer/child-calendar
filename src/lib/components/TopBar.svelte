@@ -4,11 +4,10 @@
 
 	export let className =
 		'flex items-center gap-1 text-black rounded-br-6 p-2 top-0 left-0 bg-primary-500';
-	export let backCallback: (() => string) | undefined = undefined;
 </script>
 
 <header class={className}>
-	<BackButton {backCallback} />
+	<BackButton />
 	<h1 class="font-[ScholarlyAmbition] uppercase w-full text-center my-auto text-4xl">
 		{$titleStore}
 	</h1>

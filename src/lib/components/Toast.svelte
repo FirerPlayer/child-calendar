@@ -35,7 +35,7 @@
 			animate:flip={{ duration: 500 }}
 			in:fly={{ duration: 150, x: '100%' }}
 			out:fly={{ duration: 150, x: '100%' }}
-			class="bg-secondary-500 text-txt-500 shadow-md w-full flex-col flex"
+			class="bg-cyan-200 text-txt-500 shadow-md w-full flex-col flex"
 		>
 			<div class="relative flex items-center justify-between py-5 px-2">
 				<div class="flex gap-5 items-center">
@@ -52,7 +52,7 @@
 						<ExclamationCircleFill class="w-10 h-10 text-accent-500 rounded-full" />
 					{/if}
 
-					<div class="flex flex-col gap-1">
+					<div class="flex flex-col gap-1 max-w-56 overflow-hidden">
 						<h3 use:melt={$title(id)} class="text-lg px-5 py-1 font-semibold bg-dark/30 rounded-md">
 							{data.title}
 						</h3>
@@ -63,8 +63,8 @@
 				</div>
 				<button
 					use:melt={$close(id)}
-					aria-label="close notification"
-					class="p-1 rounded-full self-start !bg-secondary-400"
+					aria-label="Fechar notificaçã"
+					class="p-1 rounded-full self-start bg-secondary-400 z-60"
 				>
 					<X class="w-6 h-6" />
 				</button>

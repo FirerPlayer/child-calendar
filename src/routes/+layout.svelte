@@ -10,7 +10,10 @@
 	import Toast, { addToast } from '$lib/components/Toast.svelte';
 	import { ClientResponseError } from 'pocketbase';
 	page.subscribe((v) => {
-		$navStack.push(v.url.pathname);
+		if (v.url.pathname === '/') {
+			$navStack.push(v.url.pathname);
+		}
+		console.log($navStack);
 	});
 
 	onMount(async () => {

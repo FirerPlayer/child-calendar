@@ -110,7 +110,7 @@
 	});
 
 	let audioAttributes: { audio: Howl; title: string } = {
-		audio: new Howl({ src: 'denis.mp3' }),
+		audio: new Howl({ src: '' }),
 		title: 'Sem audio'
 	};
 
