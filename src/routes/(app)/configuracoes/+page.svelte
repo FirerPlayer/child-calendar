@@ -104,7 +104,7 @@
 <!-- <svelte:window on:beforeunload={handleBeforeUnload} /> -->
 <div bind:this={mainDiv}>
 	<TopBar />
-	<div class="flex-(~ col) gap-3 h-[calc(100vh-3.5rem)] p-8">
+	<div class="flex-(~ col) gap-3 h-[calc(100svh-3.5rem)] p-8">
 		<h1 class="block text-lg font-bold">Cor preferida</h1>
 		<div class="flex-(~ col) gap-4 bg-primary-500 p-3 rounded-lg">
 			<div class="flex gap-2 w-full">

@@ -83,9 +83,9 @@
 	});
 </script>
 
+<!-- <div> -->
 <div
-	class="flex flex-col justify-start items-center h-100lvh
-	overflow-y-hidden text-txt-500 bg-bb-500"
+	class="flex flex-col justify-start items-center h-100svh overflow-y-auto text-txt-500 bg-bb-500"
 >
 	<!-- <img src={logo} alt="Child calendar logo" class="w-50" /> -->
 	<h1 class="text-5xl font-[SuperBoy] text-orange-500" style="letter-spacing: 4px;">REGISTRO</h1>
@@ -96,7 +96,7 @@
 			<label
 				use:ripple
 				class="w-28 h-28 rounded-full flex items-center justify-center
-					border-(~ dark-500) cursor-pointer"
+						border-(~ dark-500) cursor-pointer"
 				class:border-red-5={$errors.avatar}
 			>
 				{#if profileImgData.src != '' && !$errors.avatar}
@@ -189,16 +189,18 @@
 			use:ripple
 			type="submit"
 			class="flex items-center justify-center gap-3 p-4 mt-2 text-2xl
-			focus:ring-2 !focus:ring-primary-800 bg-primary-500 rounded-full"
+				focus:ring-2 !focus:ring-primary-800 bg-primary-500 rounded-full"
 		>
 			<RocketTakeoff class="w-8 h-8" />
 			Começar
 		</button>
 	</form>
-	<a href="/login" class="fixed bottom-2 text-txt-500 font-semibold underline text-lg"
+	<a href="/login" class="mt-auto text-txt-500 font-semibold underline text-lg"
 		>Já tem uma conta? Faça login</a
 	>
 </div>
+
+<!-- </div> -->
 
 <style>
 	.invalid {
