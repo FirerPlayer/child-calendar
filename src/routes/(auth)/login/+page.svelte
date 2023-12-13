@@ -75,7 +75,7 @@
 
 <div
 	class="flex flex-col gap-1 justify-center items-center h-100svh
-text-txt-500 bg-bb-500 overflow-y-hidden"
+text-txt-500 bg-bb-500 overflow-y-auto"
 >
 	<!-- <img
 		src={logo}
