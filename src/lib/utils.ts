@@ -53,7 +53,8 @@ export const showNativeDatePicker = async (onDateSelected: (date: string) => voi
 export const checkAuth = async () => {
 	const pb = get(pocketbase);
 	if (!pb.authStore.isValid) {
-		goto('/login');
+		// goto('/login');
+		return null;
 	}
 
 	return await pb.collection('users').getOne(pb.authStore.model?.id);

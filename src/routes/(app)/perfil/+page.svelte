@@ -91,9 +91,15 @@
 		year: 'numeric'
 	});
 	let dn: string;
-	const user = $userStores as RecordModel;
-	const avatarSrc = $pocketbase.files.getUrl(user, user.avatar);
-	console.log(avatarSrc);
+	let avatarSrc: string;
+	let user: RecordModel;
+	if (!$userStores) {
+		goto('/login');
+	} else {
+		user = $userStores;
+		avatarSrc = $pocketbase.files.getUrl(user, user.avatar);
+		console.log(avatarSrc);
+	}
 
 	// const handleBeforeunload = (ev: BeforeUnloadEvent) => {
 	// 	ev.preventDefault();
@@ -251,20 +257,6 @@
 						class:invalid={$errors.dataNascimento}
 						class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
 					/>
-					<!-- {#if isMobileDevie}
-							<button
-								use:ripple
-								type="button"
-								on:click={async () => {
-									await showNativeDatePicker((date) => {
-										dn = date;
-									});
-								}}
-								class="w-25% py-4"
-							>
-								<CalendarDate class="w-8 h-8 mx-auto" />
-							</button>
-						{/if} -->
 				</div>
 			{:else}
 				<div class="w-full flex gap-3 items-center">
@@ -274,7 +266,7 @@
 						bind:value={dn}
 						name="dataNascimento"
 						id="dataNascimento"
-						class:disable-picker={isMobileDevie}
+						class:disable-picker={true}
 						class:invalid={$errors.dataNascimento}
 						class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
 					/>

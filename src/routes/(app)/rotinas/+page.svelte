@@ -44,6 +44,20 @@
 		closeOnOutsideClick: false,
 		forceVisible: true
 	});
+	const {
+		elements: {
+			portalled: portalled3,
+			overlay: overlay3,
+			content: content3,
+			title: title3,
+			close: close3
+		},
+		states: { open: open3 }
+	} = createDialog({
+		closeOnOutsideClick: false,
+		forceVisible: true
+	});
+	// open3.set(true);
 
 	// Drawer states
 </script>
@@ -146,14 +160,68 @@
 	</div>
 </div>
 
+<div use:melt={$portalled3}>
+	{#if $open3}
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			use:melt={$overlay3}
+			on:click|preventDefault={(ev) => {
+				open3.set(false);
+			}}
+			class="fixed inset-0 z-50 bg-black/50"
+			transition:fade={{ duration: 150 }}
+		/>
+
+		<div
+			use:melt={$content3}
+			class="fixed left-0 top-0 z-50 h-screen w-full max-w-80% bg-bb-500 p-3
+			shadow-lg focus:outline-none flex flex-col gap-2"
+			transition:fly={{
+				x: -350,
+				duration: 300,
+				opacity: 1
+			}}
+		>
+			<div
+				use:melt={$title3}
+				class="w-full bg-primary-500 rounded-4 p-2 px-5 shadow-md flex items-center justify-between"
+			>
+				<h1 class="text-3xl font-semibold text-center">Criar Rotina</h1>
+				{#if currentDate}
+					<h2 class="text-xl text-center hidden md:block">
+						{getTodayString(currentDate.toDate(localTimeZone))}
+					</h2>
+				{/if}
+				<button
+					use:melt={$close3}
+					class="p-2 appearance-none items-center justify-center rounded-full text-primary-800
+						hover:bg-primary-200 focus:shadow-primary-400 focus:outline-none focus:ring-2
+						focus:ring-primary-400"
+				>
+					<X class="w-8 h-8 " />
+				</button>
+			</div>
+			{#if currentDate}
+				<h2
+					class="text-xl md:hidden text-center w-full bg-primary-500 rounded-4 p-2 px-5 shadow-md"
+				>
+					{getTodayString(currentDate.toDate(localTimeZone))}
+				</h2>
+			{/if}
+			form criar rotinas
+			<!-- <ListRotinas /> -->
+		</div>
+	{/if}
+</div>
+
 <TopBar></TopBar>
 <MonthView
 	on:dateClick={handleDateClick}
 	on:dateDrop={(e) => {
-		open2.set(true);
-		console.log('aqui de fora');
-		console.log($draggingState.data?.value);
-		console.log(e.detail);
+		if (e.detail && currentDate) {
+			currentDate = e.detail;
+		}
+		open3.set(true);
 	}}
 />
 <button

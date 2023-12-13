@@ -7,12 +7,14 @@
 		// preferedColor,
 		saveConfig,
 		titleStore,
-		type AppConfig
+		type AppConfig,
+		defaultConfig
 	} from '$lib/stores';
 	import { updateElementPrimaryColor } from '$lib/utils';
 	import { createSlider, melt } from '@melt-ui/svelte';
 	import { ContrastRatioChecker } from 'contrast-ratio-checker';
 	import { onMount } from 'svelte';
+	import { ArrowCounterclockwise, Floppy2 } from 'svelte-bootstrap-icons';
 	import { ripple } from 'svelte-ripple-action';
 	import { writable } from 'svelte/store';
 	import { scale } from 'svelte/transition';
@@ -22,7 +24,7 @@
 	let configChanged: boolean;
 	let mainDiv: HTMLElement;
 
-	const tempConfig = { ...$appConfig };
+	let tempConfig = { ...$appConfig };
 
 	const {
 		elements: { root: rootR, thumb: thumbR },
@@ -82,6 +84,18 @@
 		addToast({
 			title: 'Sucesso',
 			message: 'Configurações salvas',
+			type: 'success'
+		});
+	};
+	const handleResetar = (ev: MouseEvent) => {
+		tempConfig = { ...defaultConfig };
+		currColor = defaultConfig.preferedColor;
+		$R[0] = defaultConfig.preferedColor[0];
+		$G[0] = defaultConfig.preferedColor[1];
+		$B[0] = defaultConfig.preferedColor[2];
+		addToast({
+			title: 'Sucesso',
+			message: 'Configurações resetadas',
 			type: 'success'
 		});
 	};
@@ -157,14 +171,27 @@
 			<h1 class="block text-lg font-bold">Som para mover as rotinas</h1>
 		</div> -->
 		<ComboBox bind:selected={tempConfig.dragAndDropSound} title="Som para mover as rotinas" />
-		<button
-			use:ripple
-			on:click={handleSalvar}
-			title="Salvar alterações"
-			class="w-full bg-primary-400 p-5 font-semibold text-xl rounded-lg
-			focus:ring-2 focus:ring-primary-500 mt-auto"
-		>
-			Salvar
-		</button>
+		<div class="flex-(~ col) gap-2 mt-auto">
+			<button
+				use:ripple
+				on:click={handleResetar}
+				title="Salvar alterações"
+				class="flex items-center gap-3 justify-center gap-3w-full bg-primary-400 p-5 font-semibold text-xl rounded-lg
+				focus:ring-2 focus:ring-primary-500"
+			>
+				<ArrowCounterclockwise class="w-8 h-8" />
+				Resetar
+			</button>
+			<button
+				use:ripple
+				on:click={handleSalvar}
+				title="Salvar alterações"
+				class="flex items-center justify-center gap-3 w-full bg-primary-400 p-5 font-semibold text-xl rounded-lg
+				focus:ring-2 focus:ring-primary-500"
+			>
+				<Floppy2 class="w-8 h-8" />
+				Salvar
+			</button>
+		</div>
 	</div>
 </div>

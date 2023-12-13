@@ -47,12 +47,12 @@
 			<h5 class="font-semibold text-center">Sem imagens para exibir. <br /> Adicione uma!</h5>
 		</div>
 	{:else}
-		<div class="flex flex-col gap-4 flex-grow overflow-y-scroll">
+		<div class="grid grid-cols-3 grid-flow-row items-center place-content-start gap-5">
 			{#each imgs as im, i (i)}
 				<div class="flex flex-col gap-2px items-center">
 					<div
 						use:draggable={{
-							data: { value: 'rotina ' + i },
+							data: { value: im },
 							onDragstart(e) {
 								pickSound.play();
 							},
@@ -60,14 +60,14 @@
 								dropSound.play();
 							}
 						}}
-						class="border-(~ black) rounded-4 touch-none select-none"
+						class="border-(~ black) rounded-4 touch-none select-none w-28 h-28"
 					>
 						<img
 							draggable="false"
 							src={im.data}
 							alt={im.nome}
 							title={im.nome}
-							class="rounded-inherit pointer-events-none"
+							class="rounded-inherit pointer-events-none w-28 h-28 object-cover"
 						/>
 					</div>
 					{#if !$draggingState.on}

@@ -9,7 +9,7 @@
 	import { crossfade, fade, fly } from 'svelte/transition';
 	import audioPick from '$lib/assets/pickSound.wav';
 	import MusicPlayer from '$lib/components/MusicPlayer.svelte';
-	import CriarMidiaForm from '$lib/components/CriarMidiaForm.svelte';
+	import FormCriarMidia from '$lib/components/FormCriarMidia.svelte';
 	import LoaderSvg from '$lib/components/LoaderSVG.svelte';
 	import type { RecordModel } from 'pocketbase';
 	// import BiggerPicture from 'bigger-picture/svelte';
@@ -97,7 +97,7 @@
 					<X class="w-8 h-8 " />
 				</button>
 			</div>
-			<CriarMidiaForm midiaType={$currTab} afterSubmit={() => open.set(false)} />
+			<FormCriarMidia midiaType={$currTab} afterSubmit={() => open.set(false)} />
 		</div>
 	{/if}
 </div>
