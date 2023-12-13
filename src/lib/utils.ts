@@ -52,12 +52,24 @@ export const showNativeDatePicker = async (onDateSelected: (date: string) => voi
 
 export const checkAuth = async () => {
 	const pb = get(pocketbase);
-	if (!pb.authStore.isValid) {
-		// goto('/login');
-		return null;
+	if (!localStorage.getItem('pocketbase_auth') || !pb.authStore.isValid) {
+		pb.authStore.clear();
+		await goto('/login');
+		// return null;
 	}
-
-	return await pb.collection('users').getOne(pb.authStore.model?.id);
+	try {
+		await pb.collection('users').getOne(pb.authStore.model?.id, {
+			requestKey: 'auth'
+		});
+	} catch (error) {
+		addToast({
+			title: 'Erro',
+			message: 'Erro ao buscar perfil, talvez usuario não exista',
+			type: 'error'
+		});
+		pb.authStore.clear();
+		await goto('/login');
+	}
 };
 export function isMobile(): boolean {
 	const userAgent = navigator.userAgent;

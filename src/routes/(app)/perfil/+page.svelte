@@ -1,6 +1,6 @@
 <script lang="ts">
 	import TopBar from '$lib/components/TopBar.svelte';
-	import { isMobileDevie, pocketbase, titleStore, userStores } from '$lib/stores';
+	import { pocketbase, titleStore } from '$lib/stores';
 	import { createDropdownMenu, melt } from '@melt-ui/svelte';
 	import { createForm } from 'felte';
 	import {
@@ -10,7 +10,7 @@
 		PencilSquare,
 		Envelope
 	} from 'svelte-bootstrap-icons';
-	import { fade, fly, scale, slide } from 'svelte/transition';
+	import { fly, scale, slide } from 'svelte/transition';
 	import type { InferType } from 'yup';
 	import { updateUser } from '$lib/validators/usuario';
 	import { validator } from '@felte/validator-yup';
@@ -20,8 +20,6 @@
 	import { addToast } from '$lib/components/Toast.svelte';
 	import ImageLazy from '$lib/components/ImageLazy.svelte';
 	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
-	import type { RecordModel } from 'pocketbase';
 
 	titleStore.set('Perfil');
 	const {
@@ -91,20 +89,6 @@
 		year: 'numeric'
 	});
 	let dn: string;
-	let avatarSrc: string;
-	let user: RecordModel;
-	if (!$userStores) {
-		goto('/login');
-	} else {
-		user = $userStores;
-		avatarSrc = $pocketbase.files.getUrl(user, user.avatar);
-		console.log(avatarSrc);
-	}
-
-	// const handleBeforeunload = (ev: BeforeUnloadEvent) => {
-	// 	ev.preventDefault();
-	// 	ev.returnValue = true;
-	// };
 </script>
 
 <!-- <svelte:window on:beforeunload={handleBeforeunload} /> -->
@@ -150,6 +134,7 @@
 <!-- {#each shades as s}
 	<div class="w-full h-5" style="background-color: {s};"></div>
 {/each} -->
+
 <div class="h-[calc(100svh-3.5rem)] overflow-y-auto">
 	<form
 		use:form
@@ -158,119 +143,119 @@
 		}}
 		class="p-6 flex-(~ col) gap-3 rounded-md w-full h-max"
 	>
-		<!-- {#await $pocketbase.collection('users').getOne($pocketbase.authStore.model?.id)}
+		{#await $pocketbase.collection('users').getOne($pocketbase.authStore.model?.id)}
 			<div>Loading...</div>
-		{:then user} -->
-		<!-- {@const avatarSrc = ''} -->
+		{:then user}
+			{@const avatarSrc = $pocketbase.files.getUrl(user, user.avatar)}
 
-		<!-- Avatar -->
-		<!-- svelte-ignore a11y-missing-attribute -->
-		<div class="flex-(~ col) gap-2 items-center">
+			<!-- Avatar -->
+			<!-- svelte-ignore a11y-missing-attribute -->
 			<div class="flex-(~ col) gap-2 items-center">
-				<!-- <div class="flex items-end"> -->
-				<div
-					class="w-32 h-32 rounded-full flex items-center justify-center
+				<div class="flex-(~ col) gap-2 items-center">
+					<!-- <div class="flex items-end"> -->
+					<div
+						class="w-32 h-32 rounded-full flex items-center justify-center
 								border-(~ gray-700) cursor-pointer"
-				>
-					{#if profileImgData.src && !$errors.avatar}
-						<ImageLazy
-							{...profileImgData}
-							classNameDiv="rounded-inherit h-full flex w-full items-center justify-center"
-							classNameImg="rounded-inherit h-full w-full object-cover"
-						>
-							<PersonFill class="w-20 h-20" />
-						</ImageLazy>
-					{:else}
-						<ImageLazy
-							src={avatarSrc}
-							alt="Perfil"
-							classNameDiv="rounded-inherit h-full flex w-full items-center justify-center"
-							classNameImg="rounded-inherit h-full w-full object-cover"
-						>
-							<PersonFill class="w-20 h-20" />
-						</ImageLazy>
+					>
+						{#if profileImgData.src && !$errors.avatar}
+							<ImageLazy
+								{...profileImgData}
+								classNameDiv="rounded-inherit h-full flex w-full items-center justify-center"
+								classNameImg="rounded-inherit h-full w-full object-cover"
+							>
+								<PersonFill class="w-20 h-20" />
+							</ImageLazy>
+						{:else}
+							<ImageLazy
+								src={avatarSrc}
+								alt="Perfil"
+								classNameDiv="rounded-inherit h-full flex w-full items-center justify-center"
+								classNameImg="rounded-inherit h-full w-full object-cover"
+							>
+								<PersonFill class="w-20 h-20" />
+							</ImageLazy>
+						{/if}
+					</div>
+					<!-- </div> -->
+					{#if $errors.avatar}
+						<p transition:slide class="text-red-5 font-semibold">{$errors.avatar[0]}</p>
 					{/if}
-				</div>
-				<!-- </div> -->
-				{#if $errors.avatar}
-					<p transition:slide class="text-red-5 font-semibold">{$errors.avatar[0]}</p>
-				{/if}
-				<div class="flex gap-2 items-center">
-					<h2 class="text-txt-500 font-bold cursor-default">Foto de perfil</h2>
-					<label class="w-fit h-fit p-2 border-(~ gray-700) rounded-lg bg-primary-300 z-50">
-						<PencilSquare class="w-6 h-6" />
-						<input
-							type="file"
-							accept="image/*"
-							name="avatar"
-							class="appearance-none"
-							style="display: none;"
-						/>
-					</label>
+					<div class="flex gap-2 items-center">
+						<h2 class="text-txt-500 font-bold cursor-default">Foto de perfil</h2>
+						<label class="w-fit h-fit p-2 border-(~ gray-700) rounded-lg bg-primary-300 z-50">
+							<PencilSquare class="w-6 h-6" />
+							<input
+								type="file"
+								accept="image/*"
+								name="avatar"
+								class="appearance-none"
+								style="display: none;"
+							/>
+						</label>
+					</div>
 				</div>
 			</div>
-		</div>
 
-		<!-- Nome -->
-		<div class="flex-(~ col) gap-2">
-			<label for="nome" class="block text-lg font-bold">Nome</label>
-			{#if user.nome}
-				<input
-					type="text"
-					value={user.nome}
-					name="nome"
-					id="nome"
-					class:invalid={$errors.nome}
-					class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
-				/>
-			{:else}
-				<input
-					type="text"
-					placeholder="Informe seu nome"
-					name="nome"
-					id="nome"
-					class:invalid={$errors.nome}
-					class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
-				/>
-			{/if}
-			{#if $errors.nome}
-				<p transition:slide class="text-red-5 font-semibold">{$errors.nome[0]}</p>
-			{/if}
-		</div>
-
-		<!-- Data de Nascimento -->
-		<div class="flex-(~ col) gap-2">
-			<label for="dataNascimento" class="block text-lg font-bold">Data de Nascimento</label>
-			{#if user.dataNascimento}
-				{@const dataNasc = new Date(user.dataNascimento)}
-				<div class="w-full flex gap-3 items-center">
+			<!-- Nome -->
+			<div class="flex-(~ col) gap-2">
+				<label for="nome" class="block text-lg font-bold">Nome</label>
+				{#if user.nome}
 					<input
-						type="date"
-						value={dateFormatter.format(dataNasc)}
-						on:change={(e) => {
-							//@ts-ignore
-							dn = dateFormatter.format(e.target?.value);
-						}}
-						name="dataNascimento"
-						id="dataNascimento"
-						class:disable-picker={true}
-						class:invalid={$errors.dataNascimento}
+						type="text"
+						value={user.nome}
+						name="nome"
+						id="nome"
+						class:invalid={$errors.nome}
 						class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
 					/>
-				</div>
-			{:else}
-				<div class="w-full flex gap-3 items-center">
+				{:else}
 					<input
-						type="date"
-						placeholder="Data de Nascimento"
-						bind:value={dn}
-						name="dataNascimento"
-						id="dataNascimento"
-						class:disable-picker={true}
-						class:invalid={$errors.dataNascimento}
+						type="text"
+						placeholder="Informe seu nome"
+						name="nome"
+						id="nome"
+						class:invalid={$errors.nome}
 						class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
 					/>
-					<!-- {#if isMobileDevie}
+				{/if}
+				{#if $errors.nome}
+					<p transition:slide class="text-red-5 font-semibold">{$errors.nome[0]}</p>
+				{/if}
+			</div>
+
+			<!-- Data de Nascimento -->
+			<div class="flex-(~ col) gap-2">
+				<label for="dataNascimento" class="block text-lg font-bold">Data de Nascimento</label>
+				{#if user.dataNascimento}
+					{@const dataNasc = new Date(user.dataNascimento)}
+					<div class="w-full flex gap-3 items-center">
+						<input
+							type="date"
+							value={dateFormatter.format(dataNasc)}
+							on:change={(e) => {
+								//@ts-ignore
+								dn = dateFormatter.format(e.target?.value);
+							}}
+							name="dataNascimento"
+							id="dataNascimento"
+							class:disable-picker={true}
+							class:invalid={$errors.dataNascimento}
+							class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
+						/>
+					</div>
+				{:else}
+					<div class="w-full flex gap-3 items-center">
+						<input
+							type="date"
+							placeholder="Data de Nascimento"
+							bind:value={dn}
+							name="dataNascimento"
+							id="dataNascimento"
+							class:disable-picker={true}
+							class:invalid={$errors.dataNascimento}
+							class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
+						/>
+						<!-- {#if isMobileDevie}
 							<button
 								type="button"
 								use:ripple
@@ -284,57 +269,57 @@
 								<CalendarDate class="w-8 h-8 mx-auto" />
 							</button>
 						{/if} -->
-				</div>
-			{/if}
-			{#if $errors.dataNascimento}
-				<p transition:slide class="text-red-5 font-semibold">{$errors.dataNascimento[0]}</p>
-			{/if}
-		</div>
+					</div>
+				{/if}
+				{#if $errors.dataNascimento}
+					<p transition:slide class="text-red-5 font-semibold">{$errors.dataNascimento[0]}</p>
+				{/if}
+			</div>
 
-		<!-- Profissão -->
-		<div class="flex-(~ col) gap-2">
-			<label for="profissao" class="block text-lg font-bold">Profissão</label>
-			{#if user.profissao}
+			<!-- Profissão -->
+			<div class="flex-(~ col) gap-2">
+				<label for="profissao" class="block text-lg font-bold">Profissão</label>
+				{#if user.profissao}
+					<input
+						type="text"
+						value=""
+						name="profissao"
+						id="profissao"
+						class:invalid={$errors.profissao}
+						class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
+					/>
+				{:else}
+					<input
+						type="text"
+						placeholder="Informe sua profissao"
+						name="profissao"
+						id="profissao"
+						class:invalid={$errors.profissao}
+						class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
+					/>
+				{/if}
+				{#if $errors.profissao}
+					<p transition:slide class="text-red-5 font-semibold">{$errors.profissao[0]}</p>
+				{/if}
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+			</div>
+
+			<!-- Email -->
+			<div class="flex-(~ col) gap-2">
+				<label for="email" class="block text-lg font-bold">Email</label>
 				<input
 					type="text"
-					value=""
-					name="profissao"
-					id="profissao"
-					class:invalid={$errors.profissao}
-					class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
-				/>
-			{:else}
-				<input
-					type="text"
-					placeholder="Informe sua profissao"
-					name="profissao"
-					id="profissao"
-					class:invalid={$errors.profissao}
-					class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg focus:outline-none focus:ring-2 focus:!ring-primary-500"
-				/>
-			{/if}
-			{#if $errors.profissao}
-				<p transition:slide class="text-red-5 font-semibold">{$errors.profissao[0]}</p>
-			{/if}
-			<!-- svelte-ignore a11y-label-has-associated-control -->
-		</div>
-
-		<!-- Email -->
-		<div class="flex-(~ col) gap-2">
-			<label for="email" class="block text-lg font-bold">Email</label>
-			<input
-				type="text"
-				readonly
-				value={user.email}
-				name="email"
-				id="email"
-				class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg
+					readonly
+					value={user.email}
+					name="email"
+					id="email"
+					class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg
 					opacity-70"
-			/>
+				/>
 
-			<!-- svelte-ignore a11y-label-has-associated-control -->
-		</div>
-		<!-- {/await} -->
+				<!-- svelte-ignore a11y-label-has-associated-control -->
+			</div>
+		{/await}
 		<!-- <h1 class="text-cente font-bold text-2xl bg-white ring-2 ring-gray-700">Configurações do aplicativo</h1> -->
 
 		<button
