@@ -2,15 +2,16 @@
 	import { dropzone, type DropzoneOptions } from '$lib/actions';
 	import type { DateValue } from '@internationalized/date';
 	import { melt } from '@melt-ui/svelte';
+	import type { RecordModel } from 'pocketbase';
 
 	export let isDisabled: boolean;
 	export let isToday: boolean;
 	export let meltAction: any;
 	export let handleClick: (e: MouseEvent | TouchEvent) => void;
-	export let hasRotina: boolean | undefined;
 	export let day: DateValue;
 	export let monthWeeks: number = 6;
 	export let dropzoneOptions: DropzoneOptions;
+	export let dayRotinas: RecordModel[];
 </script>
 
 <td
@@ -33,7 +34,7 @@
 			class="font-semibold font-sans text-lg text-center
 		pointer-events-none touch-none">{day.day}</span
 		>
-		{#if hasRotina}
+		{#if dayRotinas.length}
 			<h3
 				class="bg-accent-500 text-white p-3 rounded-full text-sm
 				text-black mb-3 font-semibold pointer-events-none touch-none"

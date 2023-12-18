@@ -23,3 +23,16 @@ export const criarSom = object({
 		})
 		.required('O aúdio deve ser selecionado')
 });
+
+export const getAtualizarMidia = (midiaType: 'imagens' | 'sons') =>
+	object({
+		nome: string().required().min(4, 'Nome muito curto'),
+		data: mixed((input: File): input is File => input instanceof File)
+			.test('maxSize', midiaType + ' pode ter no máximo 5MB', (value) => {
+				if (value instanceof File) {
+					return value.size <= 5 * 1024 * 1024;
+				}
+				return true;
+			})
+			.required((midiaType === 'imagens' ? 'A ' : 'Um ') + midiaType + ' deve ser selecionada')
+	});

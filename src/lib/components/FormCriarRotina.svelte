@@ -96,6 +96,9 @@
 	const handleDataFimInput = (e: Event) => {
 		$data.dataFim = (e.target as HTMLInputElement).value;
 	};
+	onMount(() => {
+		console.log('ini: ', initialValues);
+	});
 	let inp1: HTMLInputElement;
 	let inp2: HTMLInputElement;
 </script>
@@ -157,6 +160,7 @@
 				class="flex items-center gap-3"
 			>
 				<Calendar2 class="w-8 h-8" />
+				<!-- <span>{$data.dataInicio}</span> -->
 				<span>{$data.dataInicio ? getFormattedDate(new Date($data.dataInicio)) : 'Sem data'}</span>
 				<!-- {$data.dataInicio ? $data.dataInicio.replace('T', ' às ') : 'Sem data'} -->
 			</button>

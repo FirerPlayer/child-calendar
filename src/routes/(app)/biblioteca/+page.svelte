@@ -2,7 +2,7 @@
 	import TopBar from '$lib/components/TopBar.svelte';
 	import { pocketbase, titleStore } from '$lib/stores';
 	import { createDialog, createTabs, melt } from '@melt-ui/svelte';
-	import { FileEarmarkPlus, Image, MusicNoteBeamed, X } from 'svelte-bootstrap-icons';
+	import { FileEarmarkPlus, Image, MusicNoteBeamed, PencilSquare, X } from 'svelte-bootstrap-icons';
 	import { ripple } from 'svelte-ripple-action';
 	import { Howl } from 'howler';
 	import { cubicInOut } from 'svelte/easing';
@@ -12,6 +12,7 @@
 	import FormCriarMidia from '$lib/components/FormCriarMidia.svelte';
 	import LoaderSvg from '$lib/components/LoaderSVG.svelte';
 	import type { RecordModel } from 'pocketbase';
+	import FormAtualizarMidia from '$lib/components/FormAtualizarMidia.svelte';
 	// import BiggerPicture from 'bigger-picture/svelte';
 
 	titleStore.set('Biblioteca');
@@ -20,7 +21,7 @@
 		elements: { root, list, content, trigger },
 		states: { value: currTab }
 	} = createTabs({
-		defaultValue: 'imagens'
+		defaultValue: 'sons'
 	});
 
 	const triggers = [
@@ -39,6 +40,18 @@
 	} = createDialog({
 		closeOnOutsideClick: false
 	});
+	const {
+		elements: {
+			portalled: portalled2,
+			overlay: overlay2,
+			content: dialogContent2,
+			title: title2,
+			close: close2
+		},
+		states: { open: open2 }
+	} = createDialog({
+		closeOnOutsideClick: false
+	});
 	const mapFiles = (v: RecordModel) => {
 		return {
 			...v,
@@ -52,6 +65,11 @@
 		open.set(false);
 		hasSubmited = true;
 	};
+	let handleAfterSubmit2 = () => {
+		open2.set(false);
+		hasSubmited = true;
+	};
+	let currentMidia: RecordModel | undefined;
 </script>
 
 <div use:melt={$portalled}>
@@ -96,6 +114,54 @@
 		</div>
 	{/if}
 </div>
+<div use:melt={$portalled2}>
+	{#if $open2}
+		<!-- svelte-ignore a11y-no-static-element-interactions -->
+		<div
+			use:melt={$overlay2}
+			on:click|preventDefault={(ev) => {
+				open2.set(false);
+			}}
+			class="fixed inset-0 z-50 bg-black/50"
+			transition:fade={{ duration: 150 }}
+		/>
+
+		<div
+			use:melt={$dialogContent2}
+			class="fixed left-0 top-0 z-50 h-screen w-full max-w-80% bg-bb-500 p-3
+			shadow-lg focus:outline-none flex flex-col gap-2"
+			transition:fly={{
+				x: -350,
+				duration: 300,
+				opacity: 1
+			}}
+		>
+			<div
+				use:melt={$title2}
+				class="w-full bg-primary-500 rounded-4 p-2 px-5 shadow-md flex items-center justify-between"
+			>
+				<h1 class="text-xl font-semibold text-center">
+					{$currTab === 'imagens' ? 'Imagem' : 'Som de estímulo'}
+				</h1>
+				<button
+					use:melt={$close2}
+					class="p-2 appearance-none items-center justify-center rounded-full text-primary-800
+						hover:bg-primary-200 focus:shadow-primary-400 focus:outline-none focus:ring-2
+						focus:ring-primary-400"
+				>
+					<X class="w-8 h-8 " />
+				</button>
+			</div>
+			{#if currentMidia}
+				<FormAtualizarMidia
+					midia={currentMidia}
+					midiaType={$currTab}
+					afterSubmit={handleAfterSubmit2}
+				/>
+			{/if}
+		</div>
+	{/if}
+</div>
 
 <TopBar>
 	<button
@@ -133,7 +199,13 @@
 				gap-5 overflow-y-auto h-full"
 					>
 						{#each imgs as im, i (i)}
-							<div class="flex-(~ col) gap-1 items-center">
+							<button
+								class="flex-(~ col) gap-1 items-center"
+								on:click={() => {
+									currentMidia = im;
+									open2.set(true);
+								}}
+							>
 								<img
 									draggable="false"
 									src={im.data}
@@ -145,7 +217,7 @@
 								<h3 class="font-medium max-w-20 overflow-hidden whitespace-nowrap text-ellipsis">
 									{im.nome}
 								</h3>
-							</div>
+							</button>
 						{/each}
 					</div>
 				{/if}
@@ -170,7 +242,21 @@
 					</div>
 				{:else}
 					{#each audios as aud, i (i)}
+						<!-- <div class="!h-22 bg-amber"> -->
+						<div class="absolute right-3">
+							<button
+								use:ripple
+								on:click={(e) => {
+									currentMidia = aud;
+									open2.set(true);
+								}}
+								class="p-1 rounded-lg"
+							>
+								<PencilSquare class="w-6 h-6" />
+							</button>
+						</div>
 						<MusicPlayer title={aud.nome} audio={new Howl({ src: aud.data })} />
+						<!-- </div> -->
 					{/each}
 				{/if}
 			{:catch error}

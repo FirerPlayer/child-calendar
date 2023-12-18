@@ -20,7 +20,7 @@
 		max: 100,
 		value,
 		onValueChange: ({ curr, next }) => {
-			if (!audio.playing()) {
+			if (!isPlaying) {
 				audio.seek(audioDuration * (next[0] / 100));
 			}
 			return next;
@@ -69,9 +69,9 @@
 	});
 </script>
 
-<div class="flex-(~ col) gap-1 items-center w-full {mainDivClass}">
-	<h3 class="font-medium">{title}</h3>
-	<div class="flex items-center w-full gap-4 px-4">
+<div class="flex-(~ col) gap-1 items-center justify-center w-full {mainDivClass}">
+	<h3 class="font-medium text-ellipsis w-80% whitespace-nowrap overflow-hidden">{title}</h3>
+	<div class="flex items-center w-full gap-4 px-2">
 		{#if isPlaying}
 			<button
 				type="button"

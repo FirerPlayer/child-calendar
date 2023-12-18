@@ -2,6 +2,7 @@
 	import FormCriarRotina from '$lib/components/FormCriarRotina.svelte';
 	import ImagensRotinasViews from '$lib/components/ImagensRotinasViews.svelte';
 	import ListRotinas from '$lib/components/ListRotinas.svelte';
+	import LoaderSvg from '$lib/components/LoaderSVG.svelte';
 	import MonthView, { type DateClickDetail } from '$lib/components/MonthView.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import { draggingState, localTimeZone, pocketbase, titleStore } from '$lib/stores';
@@ -100,15 +101,15 @@
 		initialValues = {
 			nome: '',
 			dataInicio:
-				$currentDate.toDate(localTimeZone).toLocaleDateString() +
-				` ${
-					nowNow.getHours() < 10 ? `0${nowNow.getHours()}` : nowNow.getHours()
-				}:${nowNow.getMinutes()}`
+				$currentDate.toString() +
+				` ${nowNow.getHours() < 10 ? `0${nowNow.getHours()}` : nowNow.getHours()}:${
+					nowNow.getMinutes() < 10 ? `0${nowNow.getMinutes()}` : nowNow.getMinutes()
+				}`
 		};
 	});
 
 	let rotinas: RecordModel[];
-	let loading: boolean = false;
+	let loading: boolean = true;
 	let error: any;
 
 	const getMonthRotinas = async (month: number) => {
@@ -117,11 +118,11 @@
 			.getFullList()
 			.then((r) => {
 				rotinas = r;
-				loading = true;
+				loading = false;
 				console.log(rotinas);
 			})
 			.catch((err) => {
-				loading = true;
+				loading = false;
 				error = err;
 				console.log(err);
 			});
@@ -278,7 +279,11 @@
 
 <TopBar></TopBar>
 <section class="h-[calc(100svh-3.5rem)] overflow-y-auto">
-	<MonthView on:dateClick={handleDateClick} {dateDrop} rotinas={[]} />
+	{#if loading}
+		<LoaderSvg class="w-12 h-12" />
+	{:else}
+		<MonthView on:dateClick={handleDateClick} {dateDrop} {rotinas} />
+	{/if}
 </section>
 <button
 	on:click={() => {

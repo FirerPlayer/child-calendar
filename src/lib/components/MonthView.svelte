@@ -39,7 +39,21 @@
 	// 	return randomNum > falseRate;
 	// }
 	export let rotinas: RecordModel[];
-	const rotinasDisplay: RotinaDisplay[] = [];
+	// const rotinasDisplay: RotinaDisplay[] = [];
+	const getDayRotinas = (day: DateValue): RecordModel[] => {
+		console.log(day.day);
+		console.log(day.month);
+		console.log(day.year);
+		const rotinasData = rotinas.filter((r) => {
+			const d = new Date(r.dataInicio);
+
+			return (
+				d.getDate() === day.day && d.getMonth() + 1 === day.month && d.getFullYear() === day.year
+			);
+		});
+		// if (rotinasData.length) console.log(rotinasData);
+		return rotinasData;
+	};
 	const {
 		elements: { calendar, heading, grid, cell, prevButton, nextButton },
 		states: { months, headingValue, daysOfWeek },
@@ -49,6 +63,8 @@
 		defaultValue: today(localTimeZone),
 		fixedWeeks: true
 	});
+	// let a = getDayRotinas(new CalendarDate(2023, 12, 8));
+	// console.log(a);
 </script>
 
 <!-- <section class="h-[calc(100lvh-3.5rem)]"> -->
@@ -99,7 +115,7 @@
 												rotina: {}
 											});
 										}}
-										hasRotina={true}
+										dayRotinas={getDayRotinas(date)}
 										dropzoneOptions={{
 											dropEffect: 'move',
 											onDrop: (e) => {
