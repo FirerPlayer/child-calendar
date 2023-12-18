@@ -1,28 +1,31 @@
-<script lang="ts">
-	import { pocketbase } from '$lib/stores';
-	import { createCombobox, melt, type ComboboxOptionProps } from '@melt-ui/svelte';
-	import { onMount } from 'svelte';
-	import { Check, ChevronDown, ChevronUp, MusicNoteBeamed } from 'svelte-bootstrap-icons';
-	import { fly } from 'svelte/transition';
-	import LoaderSvg from './LoaderSVG.svelte';
-	import pickSound from '$lib/assets/pickSound.wav';
-
-	type Som = {
+<script context="module" lang="ts">
+	export type Som = {
+		id: string;
 		nome: string;
 		userId: string;
 		data: string;
 		disabled: boolean;
 	};
-	let defaultSound: Som = {
+	export let defaultSound: Som = {
+		id: '',
 		nome: 'Som padrão',
 		data: pickSound,
 		userId: '',
 		disabled: true
 	};
+</script>
+
+<script lang="ts">
+	import { pocketbase } from '$lib/stores';
+	import { createCombobox, melt, type ComboboxOptionProps } from '@melt-ui/svelte';
+	import { Check, ChevronDown, ChevronUp, MusicNoteBeamed } from 'svelte-bootstrap-icons';
+	import { fly } from 'svelte/transition';
+	import LoaderSvg from './LoaderSVG.svelte';
+	import pickSound from '$lib/assets/pickSound.wav';
 
 	let sons: Som[] = [];
 	let loading = false;
-	export let selected: string;
+	export let selected: Som;
 
 	export let title = '';
 
@@ -42,7 +45,7 @@
 	});
 	selectedOption.subscribe((option) => {
 		if (option && option.value) {
-			selected = option.value.data;
+			selected = option.value;
 		}
 	});
 
@@ -60,7 +63,7 @@
 		loading = false;
 	};
 
-	$: filteredMangas = $touchedInput
+	$: filteredSons = $touchedInput
 		? sons.filter(({ nome, data }) => {
 				const normalizedInput = $inputValue.toLowerCase();
 				return (
@@ -108,7 +111,7 @@
 			class="flex max-h-full flex-col gap-0 overflow-y-auto bg-white px-2 py-2 text-black"
 			tabindex="0"
 		>
-			{#each filteredMangas as som, i (i)}
+			{#each filteredSons as som, i (i)}
 				<li
 					use:melt={$option(toOption(som))}
 					class="relative cursor-pointer scroll-my-2 rounded-md py-2 px-4

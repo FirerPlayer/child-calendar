@@ -43,8 +43,6 @@
 			return;
 		}
 
-		console.log($errors);
-		console.log('submit');
 		const id = $pocketbase.authStore.model?.id;
 		await $pocketbase
 			.collection('users')

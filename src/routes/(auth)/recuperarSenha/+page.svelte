@@ -20,7 +20,6 @@
 				.collection('users')
 				.requestPasswordReset(data.email)
 				.then((res) => {
-					console.log(res);
 					addToast({
 						title: 'Email enviado',
 						message: 'Um email foi enviado para redefinir sua senha',

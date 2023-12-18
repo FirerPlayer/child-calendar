@@ -33,17 +33,6 @@
 		easing: cubicInOut
 	});
 
-	let items2 = Array.from({ length: 20 }, (_, i) => {
-		const audio = new Howl({ src: audioPick });
-
-		return {
-			id: i,
-			title: `Som ${i + 1}`,
-			alt: `Descricao ${i + 1}`,
-			audio
-		};
-	});
-
 	const {
 		elements: { portalled, overlay, content: dialogContent, title, close },
 		states: { open }
@@ -56,6 +45,12 @@
 			data: $pocketbase.files.getUrl(v, v.data),
 			nome: v.nome as string
 		};
+	};
+
+	let hasSubmited = false;
+	let handleAfterSubmit = () => {
+		open.set(false);
+		hasSubmited = true;
 	};
 </script>
 
@@ -85,7 +80,7 @@
 				use:melt={$title}
 				class="w-full bg-primary-500 rounded-4 p-2 px-5 shadow-md flex items-center justify-between"
 			>
-				<h1 class="text-3xl font-semibold text-center">
+				<h1 class="text-2xl font-semibold text-center">
 					{$currTab === 'imagens' ? 'Nova imagem' : 'Novo som'}
 				</h1>
 				<button
@@ -97,7 +92,7 @@
 					<X class="w-8 h-8 " />
 				</button>
 			</div>
-			<FormCriarMidia midiaType={$currTab} afterSubmit={() => open.set(false)} />
+			<FormCriarMidia midiaType={$currTab} afterSubmit={handleAfterSubmit} />
 		</div>
 	{/if}
 </div>
@@ -107,6 +102,7 @@
 		use:ripple
 		on:click={() => {
 			open.set(true);
+			hasSubmited = false;
 		}}
 		class="focus:ring-2 focus:ring-primary-500 px-3 py-2 flex items-center rounded-full"
 	>
@@ -117,82 +113,70 @@
 	use:melt={$root}
 	class="w-full h-full flex flex-col overflow-hidden shadow-lg data-[orientation=vertical]:flex-row"
 >
+	<!-- imagens -->
 	<div use:melt={$content('imagens')} class="bg-bb-500 p-3 h-[calc(100svh-6.5rem)]">
-		<!-- imagens -->
-		{#await $pocketbase.collection('imagens').getFullList({ sort: '-created' })}
-			<div class="w-full h-full flex-(~ col) items-center justify-center">
-				<LoaderSvg class="w-16 h-16" />
-			</div>
-		{:then imagens}
-			{@const imgs = imagens.map(mapFiles)}
-			{#if !imgs.length}
+		{#key hasSubmited}
+			{#await $pocketbase.collection('imagens').getFullList({ sort: '-created' })}
 				<div class="w-full h-full flex-(~ col) items-center justify-center">
-					<Image class="w-20 h-20 opacity-40" />
-					<h5 class="font-semibold text-center">Sem imagens para exibir. <br /> Adicione uma!</h5>
+					<LoaderSvg class="w-16 h-16" />
 				</div>
-			{:else}
-				<div
-					class="grid grid-cols-2 md:grid-cols-4 grid-flow-row items-center place-content-start
+			{:then imagens}
+				{@const imgs = imagens.map(mapFiles)}
+				{#if !imgs.length}
+					<div class="w-full h-full flex-(~ col) items-center justify-center">
+						<Image class="w-20 h-20 opacity-40" />
+						<h5 class="font-semibold text-center">Sem imagens para exibir. <br /> Adicione uma!</h5>
+					</div>
+				{:else}
+					<div
+						class="grid grid-cols-2 md:grid-cols-4 grid-flow-row items-center place-content-start
 				gap-5 overflow-y-auto h-full"
-				>
-					{#each imgs as im, i (i)}
-						<div class="flex-(~ col) gap-1 items-center">
-							<img
-								draggable="false"
-								src={im.data}
-								alt={im.nome}
-								title={im.nome}
-								class="object-cover w-36 h-36 md:w-42 md:h-42"
-							/>
+					>
+						{#each imgs as im, i (i)}
+							<div class="flex-(~ col) gap-1 items-center">
+								<img
+									draggable="false"
+									src={im.data}
+									alt={im.nome}
+									title={im.nome}
+									class="object-cover w-36 h-36 md:w-42 md:h-42"
+								/>
 
-							<h3 class="font-medium max-w-20 overflow-hidden whitespace-nowrap text-ellipsis">
-								{im.nome}
-							</h3>
-						</div>
-					{/each}
-				</div>
-			{/if}
-		{:catch error}
-			<h2 class="text-red">Algum erro ocorreu: <br /> {error}</h2>
-		{/await}
-		<!-- <div
-			class="grid grid-cols-2 md:grid-cols-4 grid-flow-row items-center
-			gap-5 overflow-y-auto h-full"
-		>
-			{#each items as im}
-				<div class="flex-(~ col) gap-1 items-center">
-					<img draggable="false" src={im.src} alt={im.alt} title={im.title} />
-					<h3 class="font-medium">{im.title}</h3>
-				</div>
-			{/each}
-		</div> -->
+								<h3 class="font-medium max-w-20 overflow-hidden whitespace-nowrap text-ellipsis">
+									{im.nome}
+								</h3>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			{:catch error}
+				<h2 class="text-red">Algum erro ocorreu: <br /> {error}</h2>
+			{/await}
+		{/key}
 	</div>
-
+	<!-- sons -->
 	<div use:melt={$content('sons')} class="h-[calc(100svh-6.5rem)] bg-bb-500 p-3">
-		{#await $pocketbase.collection('sons').getFullList({ sort: '-created' })}
-			<div class="w-full h-full flex-(~ col) items-center justify-center">
-				<LoaderSvg class="w-16 h-16" />
-			</div>
-		{:then sons}
-			{@const audios = sons.map(mapFiles)}
-			{#if !audios.length}
+		{#key hasSubmited}
+			{#await $pocketbase.collection('sons').getFullList({ sort: '-created' })}
 				<div class="w-full h-full flex-(~ col) items-center justify-center">
-					<MusicNoteBeamed class="w-20 h-20 opacity-40" />
-					<h5 class="font-semibold text-center">Sem imagens para exibir. <br /> Adicione uma!</h5>
+					<LoaderSvg class="w-16 h-16" />
 				</div>
-			{:else}
-				{#each audios as aud, i (i)}
-					<MusicPlayer title={aud.nome} audio={new Howl({ src: aud.data })} />
-				{/each}
-			{/if}
-		{:catch error}
-			<h2 class="text-red">Algum erro ocorreu: <br /> {error}</h2>
-		{/await}
-		<!-- sons -->
-		<div
-			class="flex-(~ col) gap-5 items-center
-			overflow-y-auto h-full"
-		></div>
+			{:then sons}
+				{@const audios = sons.map(mapFiles)}
+				{#if !audios.length}
+					<div class="w-full h-full flex-(~ col) items-center justify-center">
+						<MusicNoteBeamed class="w-20 h-20 opacity-40" />
+						<h5 class="font-semibold text-center">Sem sons para exibir. <br /> Adicione um!</h5>
+					</div>
+				{:else}
+					{#each audios as aud, i (i)}
+						<MusicPlayer title={aud.nome} audio={new Howl({ src: aud.data })} />
+					{/each}
+				{/if}
+			{:catch error}
+				<h2 class="text-red">Algum erro ocorreu: <br /> {error}</h2>
+			{/await}
+		{/key}
 	</div>
 
 	<div

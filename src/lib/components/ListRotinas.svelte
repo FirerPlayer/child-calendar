@@ -1,18 +1,26 @@
 <script lang="ts">
+	import { localTimeZone, pocketbase } from '$lib/stores';
 	import { ripple } from 'svelte-ripple-action';
+	import LoaderSvg from './LoaderSVG.svelte';
+	import type { DateValue } from '@internationalized/date';
+	import type { RecordModel } from 'pocketbase';
+
+	export let currentDate: DateValue;
+	export let rotinas: RecordModel[];
 </script>
 
-<div class="flex flex-col gap-4 flex-grow overflow-y-scroll">
-	{#each Array.from({ length: 18 }) as item, i}
+<div class="flex flex-col gap-4 flex-grow overflow-y-auto">
+	{#each rotinas as r, i}
+		{@const imagem = r.expand?.imagem}
+		{@const rotinaImgSrc = $pocketbase.files.getUrl(imagem, imagem.data)}
 		<div use:ripple class="flex gap-3 p-2 rounded-4 min-h-21 shadow-lg bg-primary-200">
-			<img src="https://placehold.co/400" alt="Rotina" width="80" height="80" />
+			<img src={rotinaImgSrc} alt={r.imagem.nome} class="w-20 h-20 object-cover" />
 			<div class="flex flex-col gap-2px box-content">
-				<h3 class="text-base font-semibold">Titulo da rotina</h3>
+				<h3 class="text-base font-semibold">{r.nome}</h3>
 				<p class="text-sm w-full line-clamp-2 overflow-y-hidden text-ellipsis">
-					Lorem, ipsum dolor sit amet consectetur adipisicing elit. Commodi quisquam odio natus
-					dolore vero minus sint impedit, inventore numquam sequi laudantium, similique minima ipsum
-					quaerat accusantium corporis obcaecati rerum deserunt!
+					{r.descricao}
 				</p>
+				<p class="text-sm opacity-75">{r.dataInicio} - {r.dataFim}</p>
 			</div>
 		</div>
 	{/each}

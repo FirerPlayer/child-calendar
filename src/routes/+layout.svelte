@@ -8,12 +8,10 @@
 	import { navStack, pocketbase, titleStore } from '$lib/stores';
 	import { onMount } from 'svelte';
 	import Toast, { addToast } from '$lib/components/Toast.svelte';
-	import { ClientResponseError } from 'pocketbase';
 	page.subscribe((v) => {
 		if (v.url.pathname === '/') {
 			$navStack.push(v.url.pathname);
 		}
-		console.log($navStack);
 	});
 
 	onMount(async () => {

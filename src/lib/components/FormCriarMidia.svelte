@@ -3,16 +3,18 @@
 	import { criarImagem, criarSom } from '$lib/validators/midias';
 	import { validator } from '@felte/validator-yup';
 	import { createForm } from 'felte';
-	import { CardText, CloudUpload, Image, MusicNote } from 'svelte-bootstrap-icons';
+	import { CardText, CloudUpload, Floppy2, Image, MusicNote } from 'svelte-bootstrap-icons';
 	import { ripple } from 'svelte-ripple-action';
 	import { slide } from 'svelte/transition';
 	import type { InferType } from 'yup';
 	import { Howl } from 'howler';
 	import MusicPlayer from './MusicPlayer.svelte';
 	import { addToast } from './Toast.svelte';
+	import LoaderSvg from './LoaderSVG.svelte';
 
 	export let midiaType: 'imagens' | 'sons' | string = 'imagens';
-	export let afterSubmit: (data?: { nome: string; data: File }) => void = () => {};
+	export let afterSubmit: (data?: InferType<typeof criarImagem>) => void = () => {};
+	let loading = false;
 
 	const {
 		form: imagemForm,
@@ -21,6 +23,7 @@
 	} = createForm<InferType<typeof criarImagem>>({
 		extend: validator({ schema: criarImagem }),
 		async onSubmit(data) {
+			loading = true;
 			await $pocketbase
 				.collection('imagens')
 				.create({ ...data, userId: $pocketbase.authStore.model?.id })
@@ -31,13 +34,15 @@
 						type: 'success'
 					});
 					afterSubmit(data);
+					loading = false;
 				})
 				.catch((err) => {
+					loading = false;
 					if (err.status !== 200) {
 						if (err.data) {
 							addToast({
 								title: 'Erro',
-								message: err.data.message,
+								message: 'Falha ao criar midia',
 								type: 'error'
 							});
 						} else {
@@ -59,6 +64,7 @@
 	} = createForm<InferType<typeof criarSom>>({
 		extend: validator({ schema: criarSom }),
 		async onSubmit(data) {
+			loading = true;
 			await $pocketbase
 				.collection('sons')
 				.create({ ...data, userId: $pocketbase.authStore.model?.id })
@@ -69,13 +75,15 @@
 						type: 'success'
 					});
 					afterSubmit(data);
+					loading = false;
 				})
 				.catch((err) => {
+					loading = false;
 					if (err.status !== 200) {
 						if (err.data) {
 							addToast({
 								title: 'Erro',
-								message: err.data.message,
+								message: 'Falha ao criar midia',
 								type: 'error'
 							});
 						} else {
@@ -109,8 +117,7 @@
 		reader.readAsDataURL(v.data);
 	});
 
-	let audioAttributes: { audio: Howl; title: string } = {
-		audio: new Howl({ src: '' }),
+	let audioAttributes: { audio?: Howl; title: string } = {
 		title: 'Sem audio'
 	};
 
@@ -128,6 +135,8 @@
 		audioAttributes.title = v.data.name;
 		reader.readAsDataURL(v.data);
 	});
+
+	$: audioIsCorrectSelected = $dataAudio.data && audioAttributes.audio && !$errorsAudio.data;
 </script>
 
 {#if midiaType === 'imagens'}
@@ -191,9 +200,14 @@
 		<button
 			use:ripple
 			type="submit"
-			class="bg-secondary-500 rounded-lg flex items-center justify-center gap-5 !p-5
+			class="bg-primary-400 rounded-lg flex items-center justify-center gap-5 !p-5
 		text-2xl !focus:ring-primary-800 mt-auto justify-self-end"
 		>
+			{#if loading}
+				<LoaderSvg class="w-8 h-8" />
+			{:else}
+				<Floppy2 class="w-8 h-8" />
+			{/if}
 			Salvar imagem
 		</button>
 	</form>
@@ -209,7 +223,7 @@
 				name="nome"
 				id="nome"
 				class="w-full px-3 py-4 rounded-4 focus:outline-none focus:ring-2 focus:ring-primary-500 ring-(~ black)"
-				placeholder="Nome da imagem"
+				placeholder="Nome do som"
 				class:invalid={$errorsAudio.nome}
 			/>
 			{#if $errorsAudio.nome}
@@ -224,19 +238,12 @@
 			<!-- svelte-ignore a11y-missing-attribute -->
 			<label
 				class="w-full h-32 rounded-lg flex-(~ col) items-center justify-center
-				border-(~ dark-500) cursor-pointer"
+		border-(~ dark-500) cursor-pointer"
+				style={audioIsCorrectSelected ? 'display: none;' : ''}
 				class:border-red-5={$errorsAudio.data}
 			>
-				{#if $dataAudio.data}
-					<MusicPlayer mainDivClass="z-99999" {...audioAttributes} />
-					<h4 class="text-xs font-semibold text-center">
-						{Math.round($dataAudio.data.size / 1024)} KB
-					</h4>
-				{:else}
-					<CloudUpload class="w-16 h-16" />
-					<h4 class="text-lg font-semibold">Selecione um áudio</h4>
-				{/if}
-
+				<CloudUpload class="w-16 h-16" />
+				<h4 class="text-lg font-semibold">Selecione um áudio</h4>
 				<input
 					type="file"
 					accept="audio/*"
@@ -249,13 +256,28 @@
 			{#if $errorsAudio.data}
 				<p transition:slide class="text-red-5 font-semibold">{$errorsAudio.data[0]}</p>
 			{/if}
+			{#if audioIsCorrectSelected && audioAttributes.audio}
+				<MusicPlayer
+					mainDivClass="z-99999"
+					title={audioAttributes.title}
+					audio={audioAttributes.audio}
+				/>
+				<h4 class="text-xs font-semibold text-center">
+					{Math.round($dataAudio.data.size / 1024)} KB
+				</h4>
+			{/if}
 		</div>
 		<button
 			use:ripple
 			type="submit"
-			class="bg-secondary-500 rounded-lg flex items-center justify-center gap-5 !p-5
+			class="bg-primary-400 rounded-lg flex items-center justify-center gap-5 !p-5
 		text-2xl !focus:ring-primary-800 mt-auto justify-self-end"
 		>
+			{#if loading}
+				<LoaderSvg class="w-8 h-8" />
+			{:else}
+				<Floppy2 class="w-8 h-8" />
+			{/if}
 			Salvar áudio
 		</button>
 	</form>

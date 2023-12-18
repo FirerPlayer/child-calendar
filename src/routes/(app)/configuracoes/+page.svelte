@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ComboBox from '$lib/components/ComboBox.svelte';
+	import ComboBoxSons from '$lib/components/ComboBoxSons.svelte';
 	import { addToast } from '$lib/components/Toast.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import {
@@ -170,7 +170,7 @@
 		<!-- <div>
 			<h1 class="block text-lg font-bold">Som para mover as rotinas</h1>
 		</div> -->
-		<ComboBox bind:selected={tempConfig.dragAndDropSound} title="Som para mover as rotinas" />
+		<ComboBoxSons bind:selected={tempConfig.dragAndDropSound} title="Som para mover as rotinas" />
 		<div class="flex-(~ col) gap-2 mt-auto">
 			<button
 				use:ripple

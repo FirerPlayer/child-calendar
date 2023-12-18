@@ -3,9 +3,9 @@ import { mixed, object, string } from 'yup';
 export const criarImagem = object({
 	nome: string().required().min(4, 'Nome muito curto'),
 	data: mixed((input: File): input is File => input instanceof File)
-		.test('maxSize', 'Imagem pode ter no máximo 15MB', (value) => {
+		.test('maxSize', 'Imagem pode ter no máximo 5MB', (value) => {
 			if (value instanceof File) {
-				return value.size <= 15 * 1024 * 1024;
+				return value.size <= 5 * 1024 * 1024;
 			}
 			return true;
 		})
@@ -15,9 +15,9 @@ export const criarImagem = object({
 export const criarSom = object({
 	nome: string().required().min(4, 'Nome muito curto'),
 	data: mixed((input: File): input is File => input instanceof File)
-		.test('maxSize', 'O aúdio pode ter no máximo 15MB', (value) => {
+		.test('maxSize', 'O aúdio pode ter no máximo 5MB', (value) => {
 			if (value instanceof File) {
-				return value.size <= 15 * 1024 * 1024;
+				return value.size <= 5 * 1024 * 1024;
 			}
 			return true;
 		})

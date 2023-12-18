@@ -30,9 +30,10 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 			//@ts-expect-error
 			let clone: HTMLElement = target.cloneNode(true);
 			clone.style.opacity = '1';
-			clone.classList.add('dragging');
+			clone.style.marginTop = '20px';
+			clone.setAttribute('id', 'dragging'); //classList.add('dragging');
 			document.body.appendChild(clone);
-			e.dataTransfer?.setDragImage(clone, 0, 0);
+			e.dataTransfer?.setDragImage(clone, 0, 20);
 			if (!options.onDragstart) return;
 			options.onDragstart(e);
 		},
@@ -42,7 +43,7 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 			// target.classList.remove('dragging');
 			target.style.width = `auto`;
 			target.style.height = `auto`;
-			document.body.removeChild(document.querySelector('.dragging') as HTMLElement);
+			document.body.removeChild(document.getElementById('dragging') as HTMLElement);
 			if (!options.onDragend) return;
 			options.onDragend(e);
 		}

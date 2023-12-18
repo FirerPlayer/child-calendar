@@ -13,7 +13,6 @@
 
 	titleStore.set('Alterar email');
 	let hasToken = $page.url.searchParams.has('token');
-	console.log(hasToken);
 	const sendEmailChangeRequest = async (email: string) => {
 		await $pocketbase
 			.collection('users')

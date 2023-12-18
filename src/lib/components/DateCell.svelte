@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { dropzone, type DropzoneOptions } from '$lib/actions';
+	import type { DateValue } from '@internationalized/date';
 	import { melt } from '@melt-ui/svelte';
 
 	export let isDisabled: boolean;
 	export let isToday: boolean;
 	export let meltAction: any;
 	export let handleClick: (e: MouseEvent | TouchEvent) => void;
-	export let dayRotinas: number | undefined;
-	export let dayNumber: number;
+	export let hasRotina: boolean | undefined;
+	export let day: DateValue;
 	export let monthWeeks: number = 6;
 	export let dropzoneOptions: DropzoneOptions;
 </script>
@@ -19,6 +20,7 @@
 	class:opacity-40={isDisabled}
 >
 	<!-- <div use:myCustomRipple> -->
+
 	<button
 		use:melt={meltAction}
 		on:click|preventDefault={handleClick}
@@ -29,14 +31,14 @@
 	>
 		<span
 			class="font-semibold font-sans text-lg text-center
-		pointer-events-none touch-none">{dayNumber}</span
+		pointer-events-none touch-none">{day.day}</span
 		>
-		{#if dayRotinas}
+		{#if hasRotina}
 			<h3
-				class="bg-accent-500 text-white px-2 py-1 rounded-full text-sm
+				class="bg-accent-500 text-white p-3 rounded-full text-sm
 				text-black mb-3 font-semibold pointer-events-none touch-none"
 			>
-				{dayRotinas}
+				<!-- {dayRotinas} -->
 			</h3>
 		{/if}
 	</button>

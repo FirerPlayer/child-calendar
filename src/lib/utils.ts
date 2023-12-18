@@ -9,7 +9,22 @@ import { addToast } from './components/Toast.svelte';
 import { ClientResponseError } from 'pocketbase';
 
 export const getTodayString = (value: Date) =>
-	new DateFormatter('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).format(value);
+	new DateFormatter('pt-BR', {
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric'
+	}).format(value);
+
+export const getFormattedDate = (
+	value: Date,
+	opts: Intl.DateTimeFormatOptions = {
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit'
+	}
+) => new DateFormatter('pt-BR', opts).format(value);
 export const hexToRgb = (hex: string): number[] => {
 	return hex.match(/[A-Za-z0-9]{2}/g)!.map((v) => parseInt(v, 16));
 };
