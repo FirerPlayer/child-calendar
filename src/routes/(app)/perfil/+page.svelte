@@ -10,16 +10,17 @@
 		PencilSquare,
 		Envelope
 	} from 'svelte-bootstrap-icons';
-	import { fly, scale, slide } from 'svelte/transition';
+	import {  scale, slide } from 'svelte/transition';
 	import type { InferType } from 'yup';
 	import { updateUser } from '$lib/validators/usuario';
 	import { validator } from '@felte/validator-yup';
 	import { DateFormatter } from '@internationalized/date';
 	import { ripple } from 'svelte-ripple-action';
-	import { logOut, showNativeDatePicker } from '$lib/utils';
+	import { logOut, } from '$lib/utils';
 	import { addToast } from '$lib/components/Toast.svelte';
 	import ImageLazy from '$lib/components/ImageLazy.svelte';
 	import { goto } from '$app/navigation';
+	import LoaderSvg from '$lib/components/LoaderSVG.svelte';
 
 	titleStore.set('Perfil');
 	const {
@@ -34,7 +35,7 @@
 	});
 	async function onSubmit(data: InferType<typeof updateUser>) {
 		let canSubmit = true;
-		Object.entries($errors).forEach(([key, value]) => {
+		Object.entries($errors).forEach(([, value]) => {
 			if (value) {
 				canSubmit = false;
 			}
@@ -47,7 +48,7 @@
 		await $pocketbase
 			.collection('users')
 			.update(id, data)
-			.then((res) => {
+			.then(() => {
 				addToast({
 					title: 'Sucesso',
 					message: 'Alterações salvas!',
@@ -134,20 +135,20 @@
 {/each} -->
 
 <div class="h-[calc(100svh-3.5rem)] overflow-y-auto">
-	<form
-		use:form
-		on:submit={(e) => {
-			onSubmit($data);
-		}}
-		class="p-6 flex-(~ col) gap-3 rounded-md w-full h-max"
-	>
-		{#await $pocketbase.collection('users').getOne($pocketbase.authStore.model?.id)}
-			<div>Loading...</div>
-		{:then user}
-			{@const avatarSrc = $pocketbase.files.getUrl(user, user.avatar)}
-
+	{#await $pocketbase.collection('users').getOne($pocketbase.authStore.model?.id)}
+		<div class="w-full h-full flex items-center justify-center">
+			<LoaderSvg class="w-16 h-16" />
+		</div>
+	{:then user}
+		{@const avatarSrc = $pocketbase.files.getUrl(user, user.avatar)}
+		<form
+			use:form
+			on:submit={() => {
+				onSubmit($data);
+			}}
+			class="p-6 flex-(~ col) gap-3 rounded-md w-full h-max"
+		>
 			<!-- Avatar -->
-			<!-- svelte-ignore a11y-missing-attribute -->
 			<div class="flex-(~ col) gap-2 items-center">
 				<div class="flex-(~ col) gap-2 items-center">
 					<!-- <div class="flex items-end"> -->
@@ -231,7 +232,7 @@
 							type="date"
 							value={dateFormatter.format(dataNasc)}
 							on:change={(e) => {
-								//@ts-ignore
+								//@ts-expect-error data esperada
 								dn = dateFormatter.format(e.target?.value);
 							}}
 							name="dataNascimento"
@@ -280,7 +281,7 @@
 				{#if user.profissao}
 					<input
 						type="text"
-						value=""
+						value={user.profissao}
 						name="profissao"
 						id="profissao"
 						class:invalid={$errors.profissao}
@@ -299,7 +300,6 @@
 				{#if $errors.profissao}
 					<p transition:slide class="text-red-5 font-semibold">{$errors.profissao[0]}</p>
 				{/if}
-				<!-- svelte-ignore a11y-label-has-associated-control -->
 			</div>
 
 			<!-- Email -->
@@ -314,22 +314,19 @@
 					class="w-full text-base bg-white ring-2 ring-gray-700 px-2 py-4 rounded-lg
 					opacity-70"
 				/>
-
-				<!-- svelte-ignore a11y-label-has-associated-control -->
 			</div>
-		{/await}
-		<!-- <h1 class="text-cente font-bold text-2xl bg-white ring-2 ring-gray-700">Configurações do aplicativo</h1> -->
-
-		<button
-			use:ripple
-			type="submit"
-			title="Salvar alterações"
-			class="w-full bg-primary-400 p-5 font-semibold text-xl rounded-lg
+			<button
+				use:ripple
+				type="submit"
+				title="Salvar alterações"
+				class="w-full bg-primary-400 p-5 font-semibold text-xl rounded-lg
 			focus:ring-2 focus:ring-primary-500 mt-auto"
-		>
-			Salvar
-		</button>
-	</form>
+			>
+				Salvar
+			</button>
+		</form>
+	{/await}
+	<!-- <h1 class="text-cente font-bold text-2xl bg-white ring-2 ring-gray-700">Configurações do aplicativo</h1> -->
 </div>
 
 <style>

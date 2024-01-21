@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import FormCriarRotina from '$lib/components/FormCriarRotina.svelte';
 	import ImagensRotinasViews from '$lib/components/ImagensRotinasViews.svelte';
 	import ListRotinas from '$lib/components/ListRotinas.svelte';
@@ -6,7 +7,7 @@
 	import MonthView, { type DateClickDetail } from '$lib/components/MonthView.svelte';
 	import TopBar from '$lib/components/TopBar.svelte';
 	import { draggingState, localTimeZone, pocketbase, titleStore } from '$lib/stores';
-	import { getTodayString } from '$lib/utils';
+	import { getDayRotinas, getTodayString } from '$lib/utils';
 	import type { CalendarDate, DateValue } from '@internationalized/date';
 	import { createDialog, melt } from '@melt-ui/svelte';
 	import type { RecordModel } from 'pocketbase';
@@ -83,13 +84,11 @@
 			title: v.data.nome
 		};
 	});
-
-	let dropDateStr = '';
-	currentDate.subscribe((v) => {
-		if (v) {
-			console.log(dropDateStr);
-		}
-	});
+	// currentDate.subscribe((v) => {
+	// 	if (v) {
+	// 		console.log(dropDateStr);
+	// 	}
+	// });
 	// open3.set(true);
 	// open2.set(true);
 	// Drawer states
@@ -111,15 +110,15 @@
 	let rotinas: RecordModel[];
 	let loading: boolean = true;
 	let error: any;
+	let changedRotinas = writable(false);
 
-	const getMonthRotinas = async (month: number) => {
+	const getMonthRotinas = async () => {
 		await $pocketbase
 			.collection('rotinas')
-			.getFullList()
-			.then((r) => {
-				rotinas = r;
+			.getFullList({ expand: 'imagem' })
+			.then((res) => {
+				rotinas = res;
 				loading = false;
-				console.log(rotinas);
 			})
 			.catch((err) => {
 				loading = false;
@@ -127,9 +126,10 @@
 				console.log(err);
 			});
 	};
-	onMount(async () => {
-		await getMonthRotinas(nowNow.getMonth());
+	changedRotinas.subscribe(async (v) => {
+		await getMonthRotinas();
 	});
+	// open1.set(true);
 </script>
 
 <div use:melt={$portalled}>
@@ -146,7 +146,7 @@
 
 		<div
 			use:melt={$content}
-			class="fixed left-0 top-0 z-50 h-screen w-full max-w-80% bg-bb-500 p-3
+			class="fixed left-0 top-0 z-50 h-screen w-full w-ful bg-bb-500 p-3
 			shadow-lg focus:outline-none flex flex-col gap-2"
 			transition:fly={{
 				x: -350,
@@ -180,7 +180,13 @@
 					{getTodayString($currentDate.toDate(localTimeZone))}
 				</h2>
 			{/if}
-			<ListRotinas currentDate={$currentDate} rotinas={[]} />
+			<ListRotinas
+				currentDate={$currentDate}
+				rotinas={getDayRotinas(rotinas, $currentDate)}
+				on:rotinaClick={(e) => {
+					goto(`/rotinas/completar/${e.detail.id}`);
+				}}
+			/>
 		</div>
 	{/if}
 </div>
@@ -271,7 +277,14 @@
 					<X class="w-8 h-8 " />
 				</button>
 			</div>
-			<FormCriarRotina {imgData} afterSubmit={() => open3.set(false)} {initialValues} />
+			<FormCriarRotina
+				{imgData}
+				afterSubmit={() => {
+					open3.set(false);
+					changedRotinas.set(true);
+				}}
+				{initialValues}
+			/>
 			<!-- <ListRotinas /> -->
 		</div>
 	{/if}
@@ -280,9 +293,13 @@
 <TopBar></TopBar>
 <section class="h-[calc(100svh-3.5rem)] overflow-y-auto">
 	{#if loading}
-		<LoaderSvg class="w-12 h-12" />
+		<div class="w-full h-full flex items-center justify-center">
+			<LoaderSvg class="w-12 h-12" />
+		</div>
 	{:else}
-		<MonthView on:dateClick={handleDateClick} {dateDrop} {rotinas} />
+		{#key $changedRotinas}
+			<MonthView on:dateClick={handleDateClick} {dateDrop} {rotinas} />
+		{/key}
 	{/if}
 </section>
 <button

@@ -7,7 +7,6 @@
 	import { Howl } from 'howler';
 	import { cubicInOut } from 'svelte/easing';
 	import { crossfade, fade, fly } from 'svelte/transition';
-	import audioPick from '$lib/assets/pickSound.wav';
 	import MusicPlayer from '$lib/components/MusicPlayer.svelte';
 	import FormCriarMidia from '$lib/components/FormCriarMidia.svelte';
 	import LoaderSvg from '$lib/components/LoaderSVG.svelte';
@@ -21,7 +20,7 @@
 		elements: { root, list, content, trigger },
 		states: { value: currTab }
 	} = createTabs({
-		defaultValue: 'sons'
+		defaultValue: 'imagens'
 	});
 
 	const triggers = [
@@ -77,7 +76,10 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			use:melt={$overlay}
-			on:click|preventDefault={(ev) => {
+			on:click|preventDefault={() => {
+				open.set(false);
+			}}
+			on:keydown|preventDefault={() => {
 				open.set(false);
 			}}
 			class="fixed inset-0 z-50 bg-black/50"
@@ -119,8 +121,11 @@
 		<!-- svelte-ignore a11y-no-static-element-interactions -->
 		<div
 			use:melt={$overlay2}
-			on:click|preventDefault={(ev) => {
+			on:click|preventDefault={() => {
 				open2.set(false);
+			}}
+			on:keydown|preventDefault={() => {
+				open.set(false);
 			}}
 			class="fixed inset-0 z-50 bg-black/50"
 			transition:fade={{ duration: 150 }}
@@ -246,7 +251,7 @@
 						<div class="absolute right-3">
 							<button
 								use:ripple
-								on:click={(e) => {
+								on:click={() => {
 									currentMidia = aud;
 									open2.set(true);
 								}}

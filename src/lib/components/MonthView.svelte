@@ -15,12 +15,7 @@
 	import { localTimeZone, pocketbase } from '$lib/stores';
 	import DateCell from './DateCell.svelte';
 	import type { RecordModel } from 'pocketbase';
-
-	type RotinaDisplay = {
-		day: DateValue;
-		hasRotina?: boolean;
-		rotina?: RecordModel;
-	};
+	import { getDayRotinas } from '$lib/utils';
 
 	const onDateClickDispatch = createEventDispatcher();
 	// const onDateDropDispatch = createEventDispatcher();
@@ -40,20 +35,7 @@
 	// }
 	export let rotinas: RecordModel[];
 	// const rotinasDisplay: RotinaDisplay[] = [];
-	const getDayRotinas = (day: DateValue): RecordModel[] => {
-		console.log(day.day);
-		console.log(day.month);
-		console.log(day.year);
-		const rotinasData = rotinas.filter((r) => {
-			const d = new Date(r.dataInicio);
 
-			return (
-				d.getDate() === day.day && d.getMonth() + 1 === day.month && d.getFullYear() === day.year
-			);
-		});
-		// if (rotinasData.length) console.log(rotinasData);
-		return rotinasData;
-	};
 	const {
 		elements: { calendar, heading, grid, cell, prevButton, nextButton },
 		states: { months, headingValue, daysOfWeek },
@@ -78,7 +60,7 @@
 				use:melt={$heading}
 				class="w-full text-center text-2xl font-semibold font-sans capitalize"
 			>
-				{$headingValue.split(' ')[0]}
+				{$headingValue.split(' ')[0]} - {$headingValue.split(' ')[2]}
 			</h2>
 			<button use:melt={$nextButton} class="p-4">
 				<ChevronRight class="w-6 h-6" />
@@ -104,6 +86,7 @@
 								{#each weekDates as date}
 									{@const isDisabled =
 										$isDateDisabled(date) || $isDateUnavailable(date) ? true : false}
+									{@const dayRotinas = getDayRotinas(rotinas, date)}
 									<DateCell
 										{isDisabled}
 										isToday={isToday(date, localTimeZone)}
@@ -115,7 +98,7 @@
 												rotina: {}
 											});
 										}}
-										dayRotinas={getDayRotinas(date)}
+										hasRotina={dayRotinas.length != 0}
 										dropzoneOptions={{
 											dropEffect: 'move',
 											onDrop: (e) => {

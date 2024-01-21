@@ -39,13 +39,12 @@
 			data.estado = 'pendente';
 			loading = true;
 			// console.log(data);
-			if (data.dataInicio && data.dataFim) {
-				// data.dataInicio = fromDate(new Date(data.dataInicio), localTimeZone).to;
-				// data.dataFim = new Date(data.dataFim).toUTCString()
+			if (data.dataInicio) {
 				data.dataInicio = fromDate(new Date(data.dataInicio), localTimeZone).toAbsoluteString();
+			}
+			if (data.dataFim) {
 				data.dataFim = fromDate(new Date(data.dataFim), localTimeZone).toAbsoluteString();
 			}
-			console.log(data);
 			await $pocketbase
 				.collection('rotinas')
 				.create({
@@ -194,6 +193,7 @@
 			</button>
 			<input
 				bind:this={inp2}
+				min={$data.dataInicio}
 				type="datetime-local"
 				name="dataFim"
 				id="dataFim"

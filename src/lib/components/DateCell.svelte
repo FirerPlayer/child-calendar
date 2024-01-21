@@ -11,7 +11,7 @@
 	export let day: DateValue;
 	export let monthWeeks: number = 6;
 	export let dropzoneOptions: DropzoneOptions;
-	export let dayRotinas: RecordModel[];
+	export let hasRotina: boolean;
 </script>
 
 <td
@@ -34,7 +34,7 @@
 			class="font-semibold font-sans text-lg text-center
 		pointer-events-none touch-none">{day.day}</span
 		>
-		{#if dayRotinas.length}
+		{#if hasRotina}
 			<h3
 				class="bg-accent-500 text-white p-3 rounded-full text-sm
 				text-black mb-3 font-semibold pointer-events-none touch-none"

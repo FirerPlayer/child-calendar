@@ -1,6 +1,6 @@
 import { string, object, date, mixed, ref, number } from 'yup';
 export const criarRotinaForm = object({
-	nome: string().required().min(4, 'Nome muito curto'),
+	nome: string().required().min(2, 'Nome muito curto'),
 	descricao: string(),
 	dataInicio: string().notRequired(),
 	dataFim: string().notRequired(),
@@ -13,7 +13,7 @@ export const criarRotinaForm = object({
 });
 
 export const atualizarRotinaForm = object({
-	nome: string().required().min(4, 'Nome muito curto'),
+	nome: string().required().min(2, 'Nome muito curto'),
 	descricao: string(),
 	dataInicio: string().notRequired(),
 	dataFim: string().notRequired(),

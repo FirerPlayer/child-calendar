@@ -1,4 +1,4 @@
-import { CalendarDate, DateFormatter } from '@internationalized/date';
+import { CalendarDate, DateFormatter, type DateValue } from '@internationalized/date';
 import { getColors } from 'theme-colors';
 import { DatePicker } from '@capacitor-community/date-picker';
 import type { DatePickerTheme } from '@capacitor-community/date-picker';
@@ -6,7 +6,19 @@ import { goto } from '$app/navigation';
 import { get } from 'svelte/store';
 import { pocketbase } from './stores';
 import { addToast } from './components/Toast.svelte';
-import { ClientResponseError } from 'pocketbase';
+import type { RecordModel } from 'pocketbase';
+
+export const getDayRotinas = (rotinas: RecordModel[], day: DateValue): RecordModel[] => {
+	const rotinasData = rotinas.filter((r) => {
+		const d = new Date(r.dataInicio);
+
+		return (
+			d.getDate() === day.day && d.getMonth() + 1 === day.month && d.getFullYear() === day.year
+		);
+	});
+	// if (rotinasData.length) console.log(rotinasData);
+	return rotinasData;
+};
 
 export const getTodayString = (value: Date) =>
 	new DateFormatter('pt-BR', {
@@ -95,3 +107,15 @@ export const logOut = () => {
 	get(pocketbase).authStore.clear();
 	goto('/login');
 };
+
+export function converterSegundosParaTempo(totalSegundos: number) {
+	const horas = Math.floor(totalSegundos / 3600);
+	const minutos = Math.floor((totalSegundos % 3600) / 60);
+	const segundos = totalSegundos % 60;
+
+	const formatoHora = `${horas.toString().padStart(2, '0')}:${minutos
+		.toString()
+		.padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+
+	return formatoHora;
+}
